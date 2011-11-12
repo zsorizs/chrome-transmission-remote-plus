@@ -171,8 +171,9 @@ function refreshPopup() {
 	// persistent torrent type dropdown and filter textbox
 	document.getElementById('filter_type').value = localStorage.torrentType;
 	if (localStorage.torrentFilter !== '') {
-		document.getElementById('filter_input').value = localStorage.torrentFilter;
-		document.getElementById('filter_clear').style.display = 'block';
+		var filterValue = localStorage.torrentFilter || "";
+		document.getElementById('filter_input').value = filterValue;
+		document.getElementById('filter_clear').style.display = filterValue ? 'block' : 'none';
 	}
 
 	// initial baseline of torrents, turtle mode, then start the refresh
