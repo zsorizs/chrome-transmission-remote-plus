@@ -12,161 +12,138 @@ all copies or substantial portions of the Software. */
 
 // worker capability
 self.addEventListener('message', function(e) {
-	self.postMessage(bdecode(e.data));
+	var decoder = new Bencode.Decode(e.data);
+	self.postMessage(decoder.getDecodedObject());
 }, false);
 
-// bencode an object
-function bencode(obj) {
-    switch(btypeof(obj)) {
-        case "string":     return bstring(obj);
-        case "number":     return bint(obj);
-        case "list":       return blist(obj);
-        case "dictionary": return bdict(obj);
-        default:           return null;
+(function() {
+
+  var Decode = (function() {
+
+    var bencodedString
+      , _object
+      , decode
+      , getType
+      , getString
+      , getNumber
+      , getValue
+      , counter
+      , incrementCounter
+      , setDecodedObject
+      , isDataStructure
+    ;
+
+    function Decode( string ) {
+      bencodedString = string;
+      counter = 0;
+
+      var type = getType();
+
+      if ( type === "string" || type === "integer" )
+        setDecodedObject( getValue( type ) );
+      else
+        setDecodedObject( decode() );
     }
-}
 
-// decode a bencoded string into a javascript object
-function bdecode(str) {
-    var dec = bparse(str);
-    if(dec != null && dec[1] == "")
-        return dec[0];
-    return null;
-}
+    decode = function() {
+      var obj = getType() === "list" ? [] : {};
 
-// parse a bencoded string; bdecode is really just a wrapper for this one.
-// all bparse* functions return an array in the form
-// [parsed object, remaining string to parse]
-function bparse(str) {
-    switch(str.charAt(0)) {
-        case "d": return bparseDict(str.substr(1));
-        case "l": return bparseList(str.substr(1));
-        case "i": return bparseInt(str.substr(1));
-        default:  return bparseString(str);
-    }
-}
+      incrementCounter( 1 );
+      var type = getType();
 
-// parse a bencoded string
-function bparseString(str) {
-    str2 = str.split(":", 1)[0];
-    if(isNum(str2)) {
-        len = parseInt(str2);
-        return [str.substr(str2.length+1, len),
-                str.substr(str2.length+1+len)];
-    }
-    return null;
-}
-
-// parse a bencoded integer
-function bparseInt(str) {
-    var str2 = str.split("e", 1)[0];
-    if(!isNum(str2))
-        return null;
-    return [str2, str.substr(str2.length+1)];
-}
-
-// parse a bencoded list
-function bparseList(str) {
-    var p, list = [];
-    while(str.charAt(0) != "e" && str.length > 0) {
-        p = bparse(str);
-        if(null == p)
-            return null;
-        list.push(p[0]);
-        str = p[1];
-    }
-    if(str.length <= 0)
-        return null;
-    return [list, str.substr(1)];
-}
-
-// parse a bencoded dictionary
-function bparseDict(str) {
-    var key, val, dict = {};
-    while(str.charAt(0) != "e" && str.length > 0) {
-        key = bparseString(str);
-        if(null == key)
-            return;
-
-        val = bparse(key[1]);
-        if(null == val)
-            return null;
-
-        dict[key[0]] = val[0];
-        str = val[1];
-    }
-    if(str.length <= 0)
-        return null;
-    return [dict, str.substr(1)];
-}
-
-// is the given string numeric?
-function isNum(str) {
-    var i, c;
-    str = str.toString();
-    if(str.charAt(0) == '-')
-        i = 1;
-    else
-        i = 0;
-
-    for(; i < str.length; i++) {
-        c = str.charCodeAt(i);
-        if(c < 48 || c > 57) {
-            return false;
+      while( counter < bencodedString.length ) {
+        if ( obj instanceof Array ) {
+          var result = isDataStructure( type ) ? decode() : getValue( type );
+          obj.push( result );
         }
+        else if ( obj instanceof Object ) {
+          var key = getValue( type );
+
+          type = getType();
+          var value = isDataStructure( type ) ? decode() : getValue( type );
+
+          obj[ key ] = value;
+        }
+        else { throw new Error("Unkown object when iterating bencoded string"); }
+
+        if ( bencodedString.charAt( counter ) === 'e' ) {
+          incrementCounter( 1 );
+          return obj;
+        }
+
+        type = getType();
+      }
     }
-    return true;
-}
 
-// returns the bencoding type of the given object
-function btypeof(obj) {
-    var type = typeof obj;
-    if(type == "object") {
-        if(typeof obj.length == "undefined")
-            return "dictionary";
-        return "list";
+    getType = function() {
+      var char = bencodedString.charAt( counter );
+
+      if ( char.match(/\d/) ) return "string";
+
+      switch( char ) {
+        case 'i':
+          return "integer";
+        case 'l':
+          return "list";
+        case 'd':
+          return "dictionary";
+        default:
+          throw new Error("Format unreadable");
+      }
     }
-    return type;
-}
 
-// bencode a string
-function bstring(str) {
-    return (str.length + ":" + str);
-}
-
-// bencode an integer
-function bint(num) {
-    return "i" + num + "e";
-}
-
-// bencode a list
-function blist(list) {
-    var str, enclist;
-    enclist = [];
-    for(key in list) {
-        enclist.push(bencode(list[key]));
+    setDecodedObject = function( obj ) {
+      return _object = obj;
     }
-    enclist.sort();
 
-    str = "l";
-    for(key in enclist) {
-        str += enclist[key];
+    incrementCounter = function( amount ) {
+      return counter += amount
     }
-    return str + "e";
-}
 
-// bencode a dictionary
-function bdict(dict) {
-    var str, enclist;
-    enclist = []
-    for(key in dict) {
-        enclist.push(bstring(key) + bencode(dict[key]));
+    getValue = function( type ) {
+      return type === "string" ? getString() : getNumber();
     }
-    enclist.sort();
 
-    str = "d";
-    for(key in enclist) {
-        str += enclist[key];
+    isDataStructure = function( type ) {
+      return ( type === "list" || type === "dictionary" ) ? true : false;
     }
-    return str + "e";
-}
+
+    getString = function() {
+      var str           = bencodedString.slice( counter )
+        , strArray      = str.split(':')
+        , len           = strArray[0]
+      ;
+
+      incrementCounter( len.length + 1 + parseInt(len) );
+
+      str = strArray[1];
+      return str.slice(0, len );
+    }
+
+    getNumber = function() {
+      var str = bencodedString.slice( counter )
+        , int = str.slice( 1, str.indexOf('e') )
+      ;
+
+      incrementCounter( int.length + 2 );
+      return parseInt( int );
+    }
+
+    // Public Accessor
+    Decode.prototype.getDecodedObject = function() {
+      return _object;
+    }
+
+    return Decode;
+  })();
+
+  String.prototype.decode = function() {
+    if ( this.length < 2 ) throw new Error("Not in Bencode Format");
+    object = new Decode( this );
+    return object.getDecodedObject();
+  }
+
+  var root = this;
+  if ( root.Bencode == null ) root.Bencode = {};
+  return root.Bencode.Decode = Decode;
+}).call(this);

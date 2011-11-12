@@ -256,7 +256,12 @@ function contextMenuClick(info, tab) {
 }
 
 // only add to context menu for links
-chrome.contextMenus.create({ 'title': 'Download with Remote Transmission', 'contexts': [ 'link' ], 'onclick': contextMenuClick });
+chrome.contextMenus.create({
+		'title': 'Download with Remote Transmission'
+	,	'contexts': [ 'link' ]
+	,	'onclick': contextMenuClick
+	//,	'targetUrlPatterns': TORRENT_LINKS
+});
 /*=================================================================================
  end context menu
 =================================================================================*/
