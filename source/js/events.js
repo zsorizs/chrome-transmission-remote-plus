@@ -40,7 +40,7 @@ document.getElementById('filter_type').addEventListener('change', function() {
 }, false);
 
 // filter torrents by name
-document.getElementById('filter_input').addEventListener('change', function() {
+document.getElementById('filter_input').addEventListener('input', function() {
 	localStorage.torrentFilter = this.value;
 
 	applyFilter();
@@ -58,6 +58,7 @@ document.getElementById('filter_clear').addEventListener('click', function() {
 // set the visibility of the clear filter button when something is typed into the filter input field
 document.getElementById('filter_input').addEventListener('keyup', function() {
 	document.getElementById('filter_clear').style.display = (this.value === '') ? 'none' : 'block';
+
 }, false);
 
 

@@ -6,7 +6,6 @@ var torrents = [],		// array of displayed torrents
 // returns: index or -1
 Array.prototype.getTorrentById = function(id) {
 	for (var i = this.length - 1; i >= 0; i--) {
-
 		if (this[i].id === id) return i;
 	}
 
@@ -128,7 +127,6 @@ port.onMessage.addListener(function(msg) {
 		// remove torrents
 		for (var i = 0, rTorrent; rTorrent = rTorrents[i]; ++i) {
 			torrent = torrents.getTorrentById(rTorrent);
-
 			if (torrent > -1) torrents.splice(torrent, 1)[0].removeElem();
 		}
 
@@ -172,11 +170,10 @@ function refreshPopup() {
 (function() {
 	// persistent torrent type dropdown and filter textbox
 	document.getElementById('filter_type').value = localStorage.torrentType;
-	if (localStorage.torrentFilter !== '') {
-		var filterValue = localStorage.torrentFilter || "";
-		document.getElementById('filter_input').value = filterValue;
-		document.getElementById('filter_clear').style.display = filterValue ? 'block' : 'none';
-	}
+
+	var filterValue = localStorage.torrentFilter || "";
+	document.getElementById('filter_input').value = filterValue;
+	document.getElementById('filter_clear').style.display = filterValue ? 'block' : 'none';
 
 	// initial baseline of torrents, turtle mode, then start the refresh
 	port.postMessage({
