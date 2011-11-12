@@ -1,16 +1,6 @@
-HTML, BODY
-{
-	margin: 0;
-	padding: 0;
-	-webkit-user-select: none;
-	background: #F8FCFE;
-	width: 100%;
-	height: 100%;
-	overflow: none;
-}
-body {
-	font: small Verdana, Arial, Helvetica, sans-serif;
+body, input, select, button {
 	color: #222;
+	font: 13px Tahoma, Geneva, 'Ubuntu', sans-serif;
 }
 
 input, select {
@@ -18,20 +8,27 @@ input, select {
 	padding: 0;
 }
 
+select {
+	height: 19px;
+}
+
 button {
 	margin: 0;
 	padding: 0 10px;
 }
 
+div.clear {
+	clear: both;
+}
+
 #container {
-	width: 650px;
-	margin: auto;
+	width: 700px;
+	margin: 0 auto;
 }
 
 #container fieldset {
-	margin-bottom: 10px;
-	-webkit-border-radius: 5px;
-	line-height: 30px;
+	margin-bottom: 20px;
+	border-radius: 5px;
 }
 
 #container fieldset legend {
@@ -41,16 +38,28 @@ button {
 #container fieldset ul {
 	margin: 0;
 	padding: 0;
-	text-align: right;
 	list-style-type: none;
 }
 
-#container fieldset ul li > div {
-	display: inline-block;
-	margin-left: 10px;
-	width: 75%;
-	text-align: left;
-	vertical-align: top;
+#container fieldset ul li {
+	line-height: 19px;
+	margin: 15px 0;
+}
+
+#container fieldset ul li span.small {
+	font-size: 9px;
+}
+
+#container fieldset ul li label.section {
+	float: left;
+	width: 155px;
+	margin-right: 15px;
+	text-align: right;
+}
+
+#container fieldset ul li div.options {
+	float: left;
+	width: 504px;
 }
 
 #ip, #path {
@@ -63,50 +72,43 @@ button {
 
 #customdirs {
 	table-layout: fixed;
-	width: 100%;
 	border-spacing: 5px;
-	line-height: normal;
-}
-
-#customdirs .label {
-	width: 30%;
-}
-
-#customdirs .dir {
-	width: 59%;
 }
 
 #customdirs th, td {
-	overflow: hidden;
 	padding: 0;
 }
 
-#customdirs input[type="text"] {
-	width: 97%;
+#customdirs input.label {
+	width: 140px;
 }
 
-.addcustom {
+#customdirs input.dir {
+	width: 276px;
+}
+
+#customdirs tr.addcustom {
 	height: 30px;
 	vertical-align: top;
 }
 
-.button {
-	display: inline-block;
+#customdirs div.button {
+	float: left;
 	width: 16px;
 	height: 12px;
-	background: url(../images/dir_buttons.png) no-repeat;
+	background-image: url(../images/dir_buttons.png);
 	cursor: pointer;
 }
 
-.button_up {
+#customdirs div.button.up {
 	background-position: 0 0;
 }
 
-.button_down {
+#customdirs div.button.down {
 	background-position: -16px 0;
 }
 
-.button_remove {
+#customdirs div.button.remove {
 	background-position: -32px 0;
 }
 

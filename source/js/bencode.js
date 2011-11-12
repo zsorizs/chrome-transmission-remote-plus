@@ -10,9 +10,9 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software. */
 
-
+// worker capability
 self.addEventListener('message', function(e) {
-  self.postMessage(bdecode(e.data));
+	self.postMessage(bdecode(e.data));
 }, false);
 
 // bencode an object

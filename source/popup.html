@@ -1,6 +1,11 @@
 <!DOCTYPE html>
-<link rel="stylesheet" type="text/css" href="css/popup.css" />
-<input type="file" id="Hfile" style="visibility:hidden; position: fixed; height:0px;" onchange="addTorrent(this.files[0])">
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="css/popup.css" />
+</head>
+
+<body>
+
 <div id="header">
 	<div id="global_stats">
 		Torrents: <b><span id="global_torrents"> </span></b><br />
@@ -15,7 +20,6 @@
 <div id="bar">
 	<div id="menu_button"></div>
 	<div id="turtle_button" title="Toggle turtle mode"></div>
-	<div id="basket"></div>
 	<span id="filter">
 		<input id="filter_input" type="text" />
 		<div id="filter_clear"></div>
@@ -33,9 +37,13 @@
 <ul id="list"></ul>
 
 <ul id="menu">
-	<li onclick="chrome.tabs.create({ url: localStorage.server + '/web/' })">full web interface</li>
+	<li onclick="chrome.windows.create({ url: 'basket.html', type: 'popup', width: 384, height: 384 });">Upload Basket</li>
+	<li onclick="chrome.tabs.create({ url: localStorage.server + localStorage.webPath })">Full Web Interface</li>
 </ul>
-<script type="text/javascript" src="js/torentAdder.js"></script>
+
 <script type="text/javascript" src="js/class.js"></script>
 <script type="text/javascript" src="js/popup.js"></script>
 <script type="text/javascript" src="js/events.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Save Torrent</title>
+<link rel="stylesheet" type="text/css" href="css/downloadTorrent.css" />
+
+</head>
+
+<body>
+
+<ul id="container">
+	<li id="torrentName"></li>
+	<li>
+		<label id="downloadLabel" for="downloadLocations">Save in folder:</label>
+		<select id="downloadLocations"></select>
+		<div class="clear"></div>
+	</li>
+	<li id="filesContainer">
+		<table id="files">
+			<tr>
+				<th class="name">
+					Name
+				</th>
+				<th class="size">
+					Size
+				</th>
+			</tr>
+		</table>
+	</li>
+</ul>
+
+<button id="save">Save</button>
+<button id="cancel">Cancel</button>
+<div class="clear"></div>
+
+<script type="text/javascript">
+
+// credit to: http://web.elctech.com/2009/01/06/convert-filesize-bytes-to-readable-string-in-javascript/
+// modified to allow for 0 bytes and removed extraneous Math.floor
+function formatBytes(bytes) {
+	if (bytes < 1) return '0 bytes';
+
+	var s = [ 'bytes', 'KB', 'MB', 'GB', 'TB', 'PB' ],
+		e = Math.floor(Math.log(bytes) / Math.log(1024));
+
+	if (e > 2) return (bytes / Math.pow(1024, e)).toFixed(2) + ' ' + s[e];
+
+	return (bytes / Math.pow(1024, e)).toFixed(1) + ' ' + s[e];
+}
+
+// populate the download popup with the torrent information
+chrome.extension.onRequest.addListener(function (request, sender) {
+	var select = document.getElementById('downloadLocations'), option,
+		table = document.getElementById('files'), row;
+
+	// add the name of the torrent
+	document.getElementById('torrentName').innerHTML = request.torrent.info.name;
+
+	// add the list of download directories
+	if (request.dirs.length === 0) {
+		select.disabled = 'disabled';
+
+		// create the default directory download option
+		option = document.createElement('option');
+		option.text = '< Default Directory >';
+		option.value = '';
+
+		select.add(option, null);
+	} else {
+		for (var i = 0, dir; dir = request.dirs[i]; ++i) {
+			option = document.createElement('option');
+			option.text = dir.label;
+			option.value = dir.dir;
+
+			select.add(option, null);
+		}
+	}
+
+	// how many files are in the torrent?
+	if (typeof request.torrent.info.files === 'undefined') {		// 1
+		row = table.insertRow(-1);
+
+		row.insertCell(0).appendChild(document.createTextNode(request.torrent.info.name));
+		row.insertCell(1).appendChild(document.createTextNode(formatBytes(request.torrent.info.length)));
+	} else {		// multiple
+		for (var i = 0, file; file = request.torrent.info.files[i]; ++i) {
+			row = table.insertRow(-1);
+
+			row.insertCell(0).appendChild(document.createTextNode(file.path[0]));
+			row.insertCell(1).appendChild(document.createTextNode(formatBytes(file.length)));
+		}
+	}
+
+	// events
+	document.getElementById('save').addEventListener('click', function (e) {
+		chrome.extension.sendRequest({ 'data': request.data, 'dir': select.options[select.selectedIndex].value });
+		window.close();
+	}, false);
+
+	document.getElementById('cancel').addEventListener('click', function (e) {
+		window.close();
+	}, false);
+});
+
+</script>
+
+</body>
+</html>

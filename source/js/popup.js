@@ -30,7 +30,7 @@ function formatBytes(bytes) {
 function formatSeconds(seconds) {
 	if (seconds < 1) return 'unknown time';
 
-	var units = [ { seconds: 86400, label: 'days' }, { seconds: 3600, label: 'hr' }, { seconds: 60, label: 'min' }, { seconds: 1, label: 'seconds' } ],
+	var units = [ { 'seconds': 86400, 'label': 'days' }, { 'seconds': 3600, 'label': 'hr' }, { 'seconds': 60, 'label': 'min' }, { 'seconds': 1, 'label': 'seconds' } ],
 		tmp, time;
 
 	// loop through units and display a max of two consecutive units
@@ -98,8 +98,10 @@ function updateStats(uTorrents) {
 function setStatusVisibility() {
 	if (document.getElementById('list').hasChildNodes()) {
 		document.getElementById('status').style.display = 'none';
+		document.getElementById('list').style.display = 'block';
 	} else {
 		document.getElementById('status').style.display = 'block';
+		document.getElementById('list').style.display = 'none';
 	}
 }
 
@@ -158,11 +160,11 @@ port.onMessage.addListener(function(msg) {
 // keep refreshing the torrent list
 function refreshPopup() {
 	port.postMessage({
-		args: '"fields": [ "id", "status", "name", "downloadDir", "metadataPercentComplete", "sizeWhenDone", "leftUntilDone", "eta", "rateDownload", "rateUpload", "uploadedEver", "addedDate", "doneDate", "recheckProgress" ], "ids": "recently-active"',
-		method: 'torrent-get',
-		tag: 2
+		'args': '"fields": [ "id", "status", "name", "downloadDir", "metadataPercentComplete", "sizeWhenDone", "leftUntilDone", "eta", "rateDownload", "rateUpload", "uploadedEver", "addedDate", "doneDate", "recheckProgress" ], "ids": "recently-active"',
+		'method': 'torrent-get',
+		'tag': 2
 	});
-	port.postMessage({ args: '', method: 'session-get', tag: 3 });		// check for turtle mode
+	port.postMessage({ 'args': '', 'method': 'session-get', 'tag': 3 });		// check for turtle mode
 
 	refresh = setTimeout(refreshPopup, 3000);
 }
@@ -178,19 +180,11 @@ function refreshPopup() {
 
 	// initial baseline of torrents, turtle mode, then start the refresh
 	port.postMessage({
-		args: '"fields": [ "id", "status", "name", "downloadDir", "metadataPercentComplete", "sizeWhenDone", "leftUntilDone", "eta", "rateDownload", "rateUpload", "uploadedEver", "addedDate", "doneDate", "recheckProgress" ]',
-		method: 'torrent-get',
-		tag: 1
+		'args': '"fields": [ "id", "status", "name", "downloadDir", "metadataPercentComplete", "sizeWhenDone", "leftUntilDone", "eta", "rateDownload", "rateUpload", "uploadedEver", "addedDate", "doneDate", "recheckProgress" ]',
+		'method': 'torrent-get',
+		'tag': 1
 	});
-	port.postMessage({ args: '', method: 'session-get', tag: 3 });
+	port.postMessage({ 'args': '', 'method': 'session-get', 'tag': 3 });
 
 	refresh = setTimeout(refreshPopup, 3000);
-	document.getElementById('basket').addEventListener('click',function (ev) {
-		if (ev.ctrlKey) {
-			document.getElementById('Hfile').click();
-		}else{
-			chrome.windows.create({width:170, height:190, type:"popup", url:"basket.html"})
-		}
-		
-	},false);
 })();

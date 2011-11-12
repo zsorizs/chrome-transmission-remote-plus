@@ -1,45 +1,63 @@
 // communication port with background page
 var port = chrome.extension.connect({ name: 'options' });
 
+// add custom download directory to table
+/*=================================================================================
+ addDir (string label, string dir)
+
+ adds a custom download location to the end of the customdirs table
+
+ parameters
+	label: (required) the lable to call the download location
+	  dir: (required) the path for the download location
+
+ returns
+	nothing
+=================================================================================*/
 function addDir(label, dir) {
+	// missing information
 	if (label === '' || dir === '') return;
 
 	var table = document.getElementById('customdirs');
 
-	for (var i = 2, rowsLength = table.rows.length; i < rowsLength; i++) {
-		if (table.rows[i].childNodes[0].textContent === label || table.rows[i].childNodes[1].textContent === dir) return;
+	// duplicate label
+	for (var i = 2, row; row = table.rows[i]; ++i) {
+		if (row.childNodes[0].childNodes[0].value === label) return;
 	}
 
-	var rowElem = table.insertRow(table.rows.length),
-		labelElem = rowElem.insertCell(0),
-		labelInputElem = document.createElement('input'),
-		dirElem = rowElem.insertCell(1),
-		dirInputElem = document.createElement('input'),
-		buttonsElem = rowElem.insertCell(2),
-		upElem = document.createElement('div'),
-		downElem = document.createElement('div'),
-		removeElem = document.createElement('div');
+	var rowElem = table.insertRow(-1),
+		col1Elem = rowElem.insertCell(-1),
+		col2Elem = rowElem.insertCell(-1),
+		col3Elem = rowElem.insertCell(-1),
+		labelElem = document.createElement('input'),
+		dirElem = document.createElement('input'),
+		upButton = document.createElement('div'),
+		downButton = document.createElement('div'),
+		removeButton = document.createElement('div');
 
-	labelElem.appendChild(labelInputElem);
-	dirElem.appendChild(dirInputElem);
-	buttonsElem.appendChild(upElem);
-	buttonsElem.appendChild(downElem);
-	buttonsElem.appendChild(removeElem);
+	col1Elem.appendChild(labelElem);
+	col2Elem.appendChild(dirElem);
+	col3Elem.appendChild(upButton);
+	col3Elem.appendChild(downButton);
+	col3Elem.appendChild(removeButton);
 
-	labelInputElem.setAttribute('type', 'text');
-	labelInputElem.setAttribute('value', label);
-	dirInputElem.setAttribute('type', 'text');
-	dirInputElem.setAttribute('value', dir);
+	labelElem.setAttribute('type', 'text');
+	labelElem.setAttribute('class', 'label');
+	labelElem.setAttribute('value', label);
+	dirElem.setAttribute('type', 'text');
+	dirElem.setAttribute('class', 'dir');
+	dirElem.setAttribute('value', dir);
 
-	upElem.setAttribute('class', 'button button_up');
-	upElem.addEventListener('click', function() { if (rowElem.previousSibling.nodeName !== 'TBODY') { table.insertBefore(rowElem, rowElem.previousSibling); } }, false);
+	upButton.setAttribute('class', 'button up');
+	upButton.addEventListener('click', function() { if (rowElem.rowIndex > 2) { table.tBodies[0].insertBefore(rowElem, rowElem.previousSibling); } }, false);
 
-	downElem.setAttribute('class', 'button button_down');
-	downElem.addEventListener('click', function() { if (rowElem !== table.lastChild) { table.insertBefore(rowElem, rowElem.nextSibling.nextSibling); } }, false);
+	downButton.setAttribute('class', 'button down');
+	downButton.addEventListener('click', function() { if (rowElem.rowIndex < (table.rows.length - 1)) { table.tBodies[0].insertBefore(rowElem, rowElem.nextSibling.nextSibling); } }, false);
 
-	removeElem.setAttribute('class', 'button button_remove');
-	removeElem.addEventListener('click', function() { table.removeChild(rowElem); }, false);
+	removeButton.setAttribute('class', 'button remove');
+	removeButton.addEventListener('click', function() { table.tBodies[0].removeChild(rowElem); }, false);
 
+	// clear the add inputs
 	document.getElementById('customlabel').value = '';
 	document.getElementById('customdir').value = '';
 }
@@ -53,19 +71,27 @@ function save() {
 		localStorage.server += '/' + document.getElementById('path').value;
 	}
 
+	localStorage.rpcPath = (document.getElementById('rpcPath').value !== '') ? '/' + document.getElementById('rpcPath').value : '';
+	localStorage.webPath = (document.getElementById('webPath').value !== '') ? '/' + document.getElementById('webPath').value + '/': '';
+
 	localStorage.user = document.getElementById('user').value;
 	localStorage.pass = document.getElementById('pass').value;
+
 	localStorage.notifications = document.getElementById('notifications').checked;
 
 	// send message to background page to en/disable notifications
 	port.postMessage({ notifications: document.getElementById('notifications').checked });
 
+	localStorage.clickAction = (document.getElementById('dlremote').checked) ? 'dlremote' : 'dllocal';
+
+	localStorage.dlPopup = document.getElementById('dlpopup').checked;
+
 	localStorage.dLocation = (document.getElementById('dldefault').checked) ? 'dldefault' : 'dlcustom';
 
 	// loop through the custom directories and save them
 	var table = document.getElementById('customdirs'), dirs = [];
-	for (var i = 2, rowsLength = table.rows.length; i < rowsLength; i++) {
-		dirs.push({ label: table.rows[i].childNodes[0].childNodes[0].value, dir: table.rows[i].childNodes[1].childNodes[0].value });
+	for (var i = 2, row; row = table.rows[i]; ++i) {
+		dirs.push({ label: row.childNodes[0].childNodes[0].value, dir: row.childNodes[1].childNodes[0].value });
 	}
 
 	localStorage.dirs = JSON.stringify(dirs);
@@ -75,42 +101,63 @@ function save() {
 }
 
 (function() {
-	// default options
-	if (typeof localStorage.server === 'undefined') localStorage.server = 'http://localhost:9091/transmission';
-	if (typeof localStorage.user === 'undefined') localStorage.user = '';
-	if (typeof localStorage.pass === 'undefined') localStorage.pass = '';
-	if (typeof localStorage.notifications === 'undefined') localStorage.notifications = true;
+	// set default options if this is a first time user or a new version
+	if (typeof localStorage.verConfig === 'undefined' || localStorage.verConfig < 5) {
+		if (typeof localStorage.server === 'undefined') localStorage.server = 'http://localhost:9091/transmission';
+		if (typeof localStorage.rpcPath === 'undefined') localStorage.rpcPath = '/rpc';
+		if (typeof localStorage.webPath === 'undefined') localStorage.webPath = '/web/';
+		if (typeof localStorage.user === 'undefined') localStorage.user = '';
+		if (typeof localStorage.pass === 'undefined') localStorage.pass = '';
+		if (typeof localStorage.notifications === 'undefined') localStorage.notifications = true;
+		if (typeof localStorage.clickAction === 'undefined') localStorage.clickAction = 'dlremote';
+		if (typeof localStorage.dlPopup === 'undefined') localStorage.dlPopup = true;
 
-	if (typeof localStorage.dLocation === 'undefined') {
-		if (typeof localStorage.dlocation !== 'undefined') {
-			localStorage.dLocation = localStorage.dlocation;
-		} else {
-			localStorage.dLocation = 'dldefault';
-			localStorage.dirs = '[]';
+		if (typeof localStorage.dLocation === 'undefined') {
+			if (typeof localStorage.dlocation !== 'undefined') {
+				localStorage.dLocation = localStorage.dlocation;
+			} else {
+				localStorage.dLocation = 'dldefault';
+				localStorage.dirs = '[]';
+			}
 		}
+
+		if (typeof localStorage.sessionId === 'undefined') localStorage.sessionId = '';
+		if (typeof localStorage.torrentType === 'undefined') localStorage.torrentType = 0;
+		if (typeof localStorage.torrentFilter === 'undefined') localStorage.torrentFilter = '';
+
+		// updated to the latest version
+		localStorage.verConfig = 5;
 	}
 
-	if (typeof localStorage.sessionId === 'undefined') localStorage.sessionId = '';
-	if (typeof localStorage.torrentType === 'undefined') localStorage.torrentType = '0';
-	if (typeof localStorage.torrentFilter === 'undefined') localStorage.torrentFilter = '';
-
-	// make sure the script knows we've updated to the latest version of the config
-	localStorage.verConfig = '2';
-
 	var dirs = JSON.parse(localStorage.dirs),
-		server_schema = localStorage.server.match(/(https?):\/\/(.*):(\d+)\/(.*)/);
+		server = localStorage.server.match(/(https?):\/\/(.+):(\d+)\/?(.*)/);
 
-	document.getElementById('protocol').value = server_schema[1];
-	document.getElementById('ip').value = server_schema[2];
-	document.getElementById('port').value = server_schema[3];
-	document.getElementById('path').value = server_schema[4];
+	// server
+	document.getElementById('protocol').value = server[1];
+	document.getElementById('ip').value = server[2];
+	document.getElementById('port').value = server[3];
+	document.getElementById('path').value = server[4];
+
+	document.getElementById('rpcPath').value = localStorage.rpcPath.replace(/\//g, '');
+	document.getElementById('webPath').value = localStorage.webPath.replace(/\//g, '');
+
 	document.getElementById('user').value = localStorage.user;
 	document.getElementById('pass').value = localStorage.pass;
+
+	// general
 	document.getElementById('notifications').checked = (localStorage.notifications === 'true') ? true : false;
 
-	document.getElementById(localStorage.dLocation).checked = true;
+	// download
+	document.getElementById(localStorage.clickAction).checked = true;
+	document.getElementById('dlpopup').checked = (localStorage.dlPopup === 'true') ? true : false;
 
-	for (var i = 0, dirsLength = dirs.length; i < dirsLength; i++) {
+	document.getElementById(localStorage.dLocation).checked = true;
+	if (localStorage.dLocation === 'dlcustom') {
+		document.getElementById('dlpopup').disabled = true;
+	}
+
+	// display the list of custom download directories
+	for (var i = 0, dir; dir = dirs[i]; ++i) {
 		addDir(dirs[i].label, dirs[i].dir);
 	}
 })();

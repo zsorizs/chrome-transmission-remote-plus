@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Save Magnet</title>
+<link rel="stylesheet" type="text/css" href="css/downloadMagnet.css" />
+
+</head>
+
+<body>
+
+<ul id="container">
+	<li>
+		<label id="downloadLabel" for="downloadLocations">Save in folder:</label>
+		<select id="downloadLocations"></select>
+		<div class="clear"></div>
+	</li>
+</ul>
+
+<button id="save">Save</button>
+<button id="cancel">Cancel</button>
+<div class="clear"></div>
+
+<script type="text/javascript">
+
+// populate the download popup with the torrent information
+chrome.extension.onRequest.addListener(function (request, sender) {
+	var select = document.getElementById('downloadLocations'), option;
+
+	// add the list of download directories
+	if (request.dirs.length === 0) {
+		select.disabled = 'disabled';
+
+		// create the default directory download option
+		option = document.createElement('option');
+		option.text = '< Default Directory >';
+		option.value = '';
+
+		select.add(option, null);
+	} else {
+		for (var i = 0, dir; dir = request.dirs[i]; ++i) {
+			option = document.createElement('option');
+			option.text = dir.label;
+			option.value = dir.dir;
+
+			select.add(option, null);
+		}
+	}
+
+	// events
+	document.getElementById('save').addEventListener('click', function (e) {
+		chrome.extension.sendRequest({ 'url': request.url, 'dir': select.options[select.selectedIndex].value });
+		window.close();
+	}, false);
+
+	document.getElementById('cancel').addEventListener('click', function (e) {
+		window.close();
+	}, false);
+});
+
+</script>
+
+</body>
+</html>
