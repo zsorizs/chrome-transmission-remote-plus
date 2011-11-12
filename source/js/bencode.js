@@ -12,8 +12,7 @@ all copies or substantial portions of the Software. */
 
 // worker capability
 self.addEventListener('message', function(e) {
-	var decoder = new Bencode.Decode(e.data);
-	self.postMessage(decoder.getDecodedObject());
+	self.postMessage(e.data.decode());
 }, false);
 
 (function() {
@@ -35,7 +34,6 @@ self.addEventListener('message', function(e) {
 
     function Decode( string ) {
       bencodedString = string;
-      counter = 0;
 
       var type = getType();
 
@@ -76,11 +74,11 @@ self.addEventListener('message', function(e) {
     }
 
     getType = function() {
-      var char = bencodedString.charAt( counter );
+      var ch = bencodedString.charAt( counter );
 
-      if ( char.match(/\d/) ) return "string";
+      if ( ch.match(/\d/) ) return "string";
 
-      switch( char ) {
+      switch( ch ) {
         case 'i':
           return "integer";
         case 'l':
@@ -122,11 +120,11 @@ self.addEventListener('message', function(e) {
 
     getNumber = function() {
       var str = bencodedString.slice( counter )
-        , int = str.slice( 1, str.indexOf('e') )
+        , i = str.slice( 1, str.indexOf('e') )
       ;
 
-      incrementCounter( int.length + 2 );
-      return parseInt( int );
+      incrementCounter( i.length + 2 );
+      return parseInt( i );
     }
 
     // Public Accessor
