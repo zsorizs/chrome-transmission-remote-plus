@@ -1,18 +1,12 @@
-/* Copyright (c) 2009 Anton Ekblad
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software. */
+/*
+ * original implementation by Ben Reinhart
+ * https://github.com/benjreinhart
+ * https://github.com/benjreinhart/bencode-js
+ */
 
 // worker capability
 self.addEventListener('message', function(e) {
-	self.postMessage(e.data.decode());
+	self.postMessage(e.data.decodeBencode());
 }, false);
 
 (function() {
@@ -26,7 +20,7 @@ self.addEventListener('message', function(e) {
       , getString
       , getNumber
       , getValue
-      , counter
+      , counter = 0
       , incrementCounter
       , setDecodedObject
       , isDataStructure
@@ -76,6 +70,8 @@ self.addEventListener('message', function(e) {
     getType = function() {
       var ch = bencodedString.charAt( counter );
 
+	  //self.postMessage("debug:" + ch + " | " + counter + " | " + bencodedString);
+
       if ( ch.match(/\d/) ) return "string";
 
       switch( ch ) {
@@ -86,7 +82,7 @@ self.addEventListener('message', function(e) {
         case 'd':
           return "dictionary";
         default:
-          throw new Error("Format unreadable");
+          throw new Error("Format unreadable: " + ch + " " + counter + " | " + bencodedString);
       }
     }
 
@@ -135,11 +131,11 @@ self.addEventListener('message', function(e) {
     return Decode;
   })();
 
-  String.prototype.decode = function() {
+  String.prototype.decodeBencode = function() {
     if ( this.length < 2 ) throw new Error("Not in Bencode Format");
     object = new Decode( this );
     return object.getDecodedObject();
-  }
+  };
 
   var root = this;
   if ( root.Bencode == null ) root.Bencode = {};

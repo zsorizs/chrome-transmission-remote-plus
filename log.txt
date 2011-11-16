@@ -6,4 +6,9 @@
 0 error(s), 0 warning(s)
 0 error(s), 0 warning(s)
 0 error(s), 0 warning(s)
+source\js\torrentParsing.js:28: WARNING - Suspicious code. This code lacks side-effects. Is there a bug?
+					default : {
+					          ^
+
+0 error(s), 1 warning(s)
 0 error(s), 0 warning(s)

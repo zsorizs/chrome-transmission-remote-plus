@@ -61,12 +61,12 @@ function decodeString(s) {
 
 // populate the download popup with the torrent information
 chrome.extension.onRequest.addListener(function (request, sender) {
-	var select = document.getElementById('downloadLocations'), option,
+	var select = document.getElementById('downloadLocations'),
+		option,
 		table = document.getElementById('files'), row;
 
-
 	var name = decodeString(request.torrent.info.name);
-		
+
 	// add the name of the torrent
 	document.getElementById('torrentName').innerHTML = name;
 

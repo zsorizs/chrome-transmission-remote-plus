@@ -17,7 +17,24 @@ function parseTorrent(torrent, callback) {
 		var worker = new Worker('js/bencode.js');
 
 		worker.onmessage = function(ev) {
-			callback(ev.data);
+
+			if (ev.data.split) {
+				var data = ev.data.split(":");
+				switch(true) {
+					case data[0] === "debug": {
+						console.debug(data[1]);
+						break;
+					}
+					default : {
+					}
+				}
+			} else {
+				callback(ev.data);
+			}
+		};
+
+		worker.onerror = function(event){
+			throw new Error(event.message + " (" + event.filename + ":" + event.lineno + ")");
 		};
 
 		worker.postMessage(reader.result);

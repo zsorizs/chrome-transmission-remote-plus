@@ -102,8 +102,16 @@ function getTorrent(url) {
 			} else {
 				parseTorrent(file, function(torrent) {
 					if (torrent !== null) {
-						chrome.windows.create({ 'url': 'downloadTorrent.html', 'type': 'popup', 'width': 852, 'height': 583 }, function(window) {
-							encodeFile(file, function(data) {
+						chrome.windows.create({
+								'url': 'downloadTorrent.html'
+							,	'type': 'popup'
+							,	'width': 850
+							,	'height': 580
+							,	'left': (screen.width/2) - 425
+							,	'top': (screen.height/2) - 265
+							},
+							function(window) {
+								encodeFile(file, function(data) {
 								chrome.tabs.sendRequest(window.tabs[0].id, { 'torrent': torrent, 'data': data, 'dirs': dirs });
 							});
 						});
