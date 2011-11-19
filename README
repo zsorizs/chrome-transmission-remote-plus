@@ -1,3 +1,16 @@
+Based on Remote Transmission.
+
+version 0.9.0
+- rename to Remote Transmission Plus
+- fix filter value if not saved in local storage
+- fix popup updating on filter change
+- try to support non ascii paths in popup
+- full file path fixed in popup
+- initial support for selecting files to download
+
+
+Original file below:
+
 Useful if you run Transmission Bittorrent Client on a remote server (LAN or across the Internet).
 
 Features
