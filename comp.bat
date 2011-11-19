@@ -11,3 +11,5 @@ FOR %%G IN (source\css\*.css) DO java -jar yuicompressor.jar %%G -o dist\%%G -v 
 "C:\Program Files\7-Zip\7z.exe" -tzip -mx=9 a dist.zip .\dist\source\* 2>>log.txt 
 
 rd dist /s /Q
+
+chrome --pack-extension=%CD%\source --pack-extension-key=%CD%\source.pem

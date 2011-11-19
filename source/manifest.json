@@ -15,11 +15,10 @@
       "32": "images/icon32.png",
       "48": "images/icon48.png"
    },
-   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDAeJgfdxJR3LQZuNZDeDfoY/rOdK4Kb4hqqOf9AeZFG2hAgyGEzdUZj/NTqsLrk3iS7QPHhkVGFukJMg4IaShko8hVDEvIVEFeXH2kTuVNnxuy3lkRtaoBmWRdjDi39c9rlUi9XKN0RcwOW1hPr8+7eM6GpmYxjugvi6v6uLuxvQIDAQAB",
-   "minimum_chrome_version": "9",
-   "name": "Remote Transmission",
+   "minimum_chrome_version": "15",
+   "name": "Remote Transmission Plus",
    "options_page": "options.html",
    "permissions": [ "http://*/", "https://*/", "contextMenus", "notifications", "tabs" ],
    "update_url": "http://clients2.google.com/service/update2/crx",
-   "version": "1.0.6"
+   "version": "0.9.1"
 }
