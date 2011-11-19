@@ -144,6 +144,10 @@ function dlTorrent(request) {
 		args += ', "download-dir": "' + request.dir + '"';
 	}
 
+	if(request.blacklist.length) {
+		args += ', "files-unwanted": [' + request.blacklist.join(',') + ']';
+	}
+
 	// send the torrent to transmission
 	rpcTransmission(args, 'torrent-add', '', function (response) {
 		// show a badge on the browser icon depending on the response from Transmission

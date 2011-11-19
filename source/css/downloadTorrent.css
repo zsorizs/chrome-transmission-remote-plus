@@ -81,10 +81,17 @@ select, button {
 	height: 23px;
 }
 
-#files th.name, #files td.name {
-	width: 85%;
+#files th.checkAll, #files td.checkAll {
+	width: 5%;
 	overflow: hidden;
 	white-space: nowrap;
+}
+
+#files th.name, #files td.name {
+	width: 80%;
+	overflow: hidden;
+	white-space: nowrap;
+	border-left: 1px solid #d2cfcc;
 }
 
 #files th.size {
@@ -105,4 +112,9 @@ select, button {
 	float: right;
 	width: 85px;
 	margin-left: 15px;
+}
+
+.listChkBox {
+	width: 29px;
+	height: 29px;
 }

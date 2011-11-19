@@ -19,6 +19,9 @@
 	<li id="filesContainer">
 		<table id="files">
 			<tr>
+				<th class="checkAll">
+					<input name="checkAll" id="checkAll" type="checkbox" checked="true">
+				</th>
 				<th class="name">
 					Name
 				</th>
@@ -63,7 +66,9 @@ function decodeString(s) {
 chrome.extension.onRequest.addListener(function (request, sender) {
 	var select = document.getElementById('downloadLocations'),
 		option,
-		table = document.getElementById('files'), row;
+		table = document.getElementById('files'),
+		row,
+		boxes;
 
 	var name = decodeString(request.torrent.info.name);
 
@@ -94,20 +99,49 @@ chrome.extension.onRequest.addListener(function (request, sender) {
 	if (typeof request.torrent.info.files === 'undefined') {		// 1
 		row = table.insertRow(-1);
 
-		row.insertCell(0).appendChild(document.createTextNode(name));
+		row.insertCell(0).appendChild(document.createTextNode(decodeString(name)));
 		row.insertCell(1).appendChild(document.createTextNode(formatBytes(request.torrent.info.length)));
 	} else {		// multiple
 		for (var i = 0, file; file = request.torrent.info.files[i]; ++i) {
 			row = table.insertRow(-1);
 
-			row.insertCell(0).appendChild(document.createTextNode(decodeString(file.path.join('/'))));
-			row.insertCell(1).appendChild(document.createTextNode(formatBytes(file.length)));
+			var chkBox = document.createElement('input');
+			chkBox.type = 'checkbox';
+			chkBox.name = 'chkFile' + i;
+			chkBox.id = 'chkFile' + i;
+			chkBox.defaultChecked = true;
+			chkBox.className = 'listChkBox';
+
+			row.insertCell(-1).appendChild(chkBox);
+			row.insertCell(-1).appendChild(document.createTextNode(decodeString(file.path.join('/'))));
+			row.insertCell(-1).appendChild(document.createTextNode(formatBytes(file.length)));
 		}
 	}
 
-	// events
+	boxes = document.querySelectorAll('input.listChkBox');
+
+	function getNotSelectedFilesIds() {
+		var list = [];
+		for(var i = 0, l = boxes.length; i < l; i++) {
+			if(!boxes.item(i).checked) {
+				list.push(i);
+			}
+		}
+		return list;
+	}
+
+	document.getElementById('checkAll').addEventListener('change', function(e) {
+		for(var i = 0, l = boxes.length; i < l; i++) {
+			boxes.item(i).checked = e.target.checked;
+		}
+	}, false);
+
 	document.getElementById('save').addEventListener('click', function (e) {
-		chrome.extension.sendRequest({ 'data': request.data, 'dir': select.options[select.selectedIndex].value });
+		chrome.extension.sendRequest({
+				'data': request.data
+			,	'dir': select.options[select.selectedIndex].value
+			,	'blacklist': getNotSelectedFilesIds() // "files-wanted" not work for some reason
+		});
 		window.close();
 	}, false);
 
