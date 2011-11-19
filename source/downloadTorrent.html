@@ -100,7 +100,7 @@ chrome.extension.onRequest.addListener(function (request, sender) {
 		for (var i = 0, file; file = request.torrent.info.files[i]; ++i) {
 			row = table.insertRow(-1);
 
-			row.insertCell(0).appendChild(document.createTextNode(decodeString(file.path[0])));
+			row.insertCell(0).appendChild(document.createTextNode(decodeString(file.path.join('/'))));
 			row.insertCell(1).appendChild(document.createTextNode(formatBytes(file.length)));
 		}
 	}
