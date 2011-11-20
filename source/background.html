@@ -1,7 +1,11 @@
 <!DOCTYPE html>
+<html>
+<head>
 <script type="text/javascript" src="js/bencode.js"></script>
 <script type="text/javascript" src="js/torrentParsing.js"></script>
 <script type="text/javascript" src="js/torrentLinks.js"></script>
+<script type="text/javascript" src="js/jquery-1.7.min.js"></script>
+
 <script type="text/javascript">
 
 // global variables
@@ -288,3 +292,7 @@ chrome.contextMenus.create({
 	if (typeof localStorage.verConfig === 'undefined' || localStorage.verConfig < 5) chrome.tabs.create({ url: 'options.html' });
 })();
 </script>
+</head>
+<body>
+</body>
+</html>

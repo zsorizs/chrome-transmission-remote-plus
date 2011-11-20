@@ -1,6 +1,8 @@
 // global variables
-var torrents = [],		// array of displayed torrents
-	refresh;		// variable that holds refreshPopup() timeout
+var		torrents = []	// array of displayed torrents
+	,	refresh			// variable that holds refreshPopup() timeout
+	,	port = chrome.extension.connect({ name: 'popup' })
+	;
 
 // search for an id in the torrents array
 // returns: index or -1
@@ -52,15 +54,12 @@ function formatSeconds(seconds) {
 
 // update the global stats
 function updateStats(uTorrents) {
-	var stats = [0, 0, 0],
-		totalDownload = 0,
-		totalUpload = 0,
-		globalTorrents = document.getElementById('global_torrents'),
-		globalDownloading = document.getElementById('global_downloading'),
-		globalSeeding = document.getElementById('global_seeding'),
-		globalPausedCompleted = document.getElementById('global_pausedcompleted'),
-		globalDownload = document.getElementById('global_downloadrate'),
-		globalUpload = document.getElementById('global_uploadrate');
+	var stats = [0, 0, 0]
+	,	totalDownload = 0
+	,	totalUpload = 0
+	,	list					= $('#list')[0]
+	,	status					= $('#status')[0]
+	;
 
 	// count how many of each status
 	for (var i = 0, torrent; torrent = torrents[i]; ++i) {
@@ -85,26 +84,25 @@ function updateStats(uTorrents) {
 	}
 
 	// update the global status
-	globalTorrents.replaceChild(document.createTextNode(torrents.length), globalTorrents.childNodes[0]);
-	globalDownloading.replaceChild(document.createTextNode(stats[0]), globalDownloading.childNodes[0]);
-	globalSeeding.replaceChild(document.createTextNode(stats[1]), globalSeeding.childNodes[0]);
-	globalPausedCompleted.replaceChild(document.createTextNode(stats[2]), globalPausedCompleted.childNodes[0]);
-	globalDownload.replaceChild(document.createTextNode(formatBytes(totalDownload)), globalDownload.childNodes[0]);
-	globalUpload.replaceChild(document.createTextNode(formatBytes(totalUpload)), globalUpload.childNodes[0]);
+	$('#global_torrents').html(torrents.length);
+	$('#global_downloading').html(stats[0]);
+	$('#global_seeding').html(stats[1]);
+	$('#global_pausedcompleted').html(stats[2]);
+	$('#global_downloadrate').html(formatBytes(totalDownload));
+	$('#global_uploadrate').html(formatBytes(totalUpload));
 }
 
 // set the visibility of the no torrents status message
 function setStatusVisibility() {
-	if (document.getElementById('list').hasChildNodes()) {
-		document.getElementById('status').style.display = 'none';
-		document.getElementById('list').style.display = 'block';
+	if (list.hasChildNodes()) {
+		$(status).hide();
+		$(list).show();
 	} else {
-		document.getElementById('status').style.display = 'block';
-		document.getElementById('list').style.display = 'none';
+		$(status).show();
+		$(list).hide();
 	}
 }
 
-var port = chrome.extension.connect({ name: 'popup' });
 port.onMessage.addListener(function(msg) {
 	switch(msg.tag)
 	{
@@ -122,18 +120,22 @@ port.onMessage.addListener(function(msg) {
 
 		break;
 	case 2:		// update
-		var rTorrents = msg.args.removed, uTorrents = msg.args.torrents, torrent;
+		var rTorrents = msg.args.removed
+		,	uTorrents = msg.args.torrents
+		,	torrent
+		;
 
 		// remove torrents
 		for (var i = 0, rTorrent; rTorrent = rTorrents[i]; ++i) {
-			torrent = torrents.getTorrentById(rTorrent);
-			if (torrent > -1) torrents.splice(torrent, 1)[0].removeElem();
+			var torrent = torrents.getTorrentById(rTorrent);
+			if (torrent > -1) {
+				torrents.splice(torrent, 1)[0].removeElem();
+			}
 		}
 
 		// add/update torrents
 		for (var i = 0, uTorrent; uTorrent = uTorrents[i]; ++i) {
-			torrent = torrents.getTorrentById(uTorrent.id);
-
+			var torrent = torrents.getTorrentById(uTorrent.id);
 			if (torrent < 0) {		// new
 				torrents.unshift(new Torrent());
 				torrents[0].createElem(uTorrent);
@@ -148,9 +150,7 @@ port.onMessage.addListener(function(msg) {
 
 		break;
 	case 3:		//turtle mode
-		if (msg.args['alt-speed-enabled']) document.getElementById('turtle_button').setAttribute('class', 'on');
-		else document.getElementById('turtle_button').removeAttribute('class');
-
+		$('#turtle_button').toggleClass('on', !!msg.args['alt-speed-enabled']);
 		break;
 	}
 });
@@ -169,11 +169,11 @@ function refreshPopup() {
 
 (function() {
 	// persistent torrent type dropdown and filter textbox
-	document.getElementById('filter_type').value = localStorage.torrentType;
+	$('#filter_type').val(localStorage.torrentType || 0);
 
 	var filterValue = localStorage.torrentFilter || "";
-	document.getElementById('filter_input').value = filterValue;
-	document.getElementById('filter_clear').style.display = filterValue ? 'block' : 'none';
+	$('#filter_input').val(filterValue);
+	$('#filter_clear').css('display', !!filterValue ? 'block' : 'none');
 
 	// initial baseline of torrents, turtle mode, then start the refresh
 	port.postMessage({

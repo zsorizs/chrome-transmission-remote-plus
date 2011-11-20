@@ -70,8 +70,6 @@ self.addEventListener('message', function(e) {
     getType = function() {
       var ch = bencodedString.charAt( counter );
 
-	  //self.postMessage("debug:" + ch + " | " + counter + " | " + bencodedString);
-
       if ( ch.match(/\d/) ) return "string";
 
       switch( ch ) {

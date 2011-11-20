@@ -4,19 +4,15 @@
 // change the delete button to indicate if it deletes data or not
 function changeDeleteButton(event, type) {
 	if (event.which === 17) {
-		var elems = document.getElementsByName('torrent_remove');
-
-		for (var i = 0, elem; elem = elems[i]; ++i) {
-			elem.setAttribute('class', 'torrent_button ' + type);
-		}
+		$('[name="torrent_remove"]').attr('class', 'torrent_button ' + type);
 	}
 }
 
 // change delete button to indicate delete w/ data
-document.addEventListener('keydown', function() { changeDeleteButton(event, 'remove_data') }, false);
+$(document).keydown(function() { changeDeleteButton(event, 'remove_data'); });
 
 // change delete button to indicate just delete from list
-document.addEventListener('keyup', function(event) { changeDeleteButton(event, 'remove') }, false);
+$(document).keyup(function(event) { changeDeleteButton(event, 'remove'); });
 
 
 //=================
@@ -24,79 +20,69 @@ document.addEventListener('keyup', function(event) { changeDeleteButton(event, '
 
 // set the current torrent filter
 function applyFilter() {
-	for (var i = 0, torrent; torrent = torrents[i]; ++i) {
-		torrent.filter();
-	}
+	$.map(torrents, function(el, idx) {
+		el.filter();
+	});
 
 	// set whether or not the no torrents status message is visible
 	setStatusVisibility();
 }
 
 // filter torrents by type
-document.getElementById('filter_type').addEventListener('change', function() {
+$('#filter_type').change( function() {
 	localStorage.torrentType = this.value;
-
 	applyFilter();
-}, false);
+});
 
 // filter torrents by name
-document.getElementById('filter_input').addEventListener('input', function() {
+$('#filter_input').bind('input', function() {
 	localStorage.torrentFilter = this.value;
-
 	applyFilter();
-}, false);
+});
 
 // clear the filter when the clear button is clicked
-document.getElementById('filter_clear').addEventListener('click', function() {
-	this.style.display = 'none';
-	document.getElementById('filter_input').value = '';
+$('#filter_clear').click( function() {
+	$(this).hide();
+	$('#filter_input').value = '';
 	localStorage.torrentFilter = '';
-
 	applyFilter();
-}, false);
+});
 
 // set the visibility of the clear filter button when something is typed into the filter input field
-document.getElementById('filter_input').addEventListener('keyup', function() {
-	document.getElementById('filter_clear').style.display = (this.value === '') ? 'none' : 'block';
-
-}, false);
+$('#filter_input').keyup( function() {
+	$('#filter_clear').css('display', (this.value === '') ? 'none' : 'block');
+});
 
 
 //=======
 // menu
 
 // toggle the menu
-document.getElementById('menu_button').addEventListener('click', function(event) {
-	var menuElem = document.getElementById('menu');
+$('#menu_button').click( function(event) {
+	var isHidden = $(this).attr('class') !== 'on';
 
-	if (this.className !== 'on') {
-		menuElem.style.display = 'block';
-		this.setAttribute('class', 'on');
-	} else {
-		menuElem.style.display = 'none';
-		this.removeAttribute('class');
-	}
+	$('#menu').toggle(isHidden);
+	$(this).toggleClass('on', isHidden);
 
 	event.stopPropagation();
-}, false);
+});
 
+//TODO: what is what actually for?
 // hide menu when something besides the menu is clicked
-document.getElementById('menu').addEventListener('click', function() { event.stopPropagation(); }, false);
-document.addEventListener('click', function() {
-	document.getElementById('menu').style.display = 'none';
-	document.getElementById('menu_button').removeAttribute('class');
-}, false);
-
+//$('#menu').click(function(event) { event.stopPropagation(); });
+/*
+$(document).click( function() {
+	$('#menu').hide();
+	$('#menu_button').attr('class', '');
+});
+*/
 
 //==============
 // turtle mode
 
 // toggle turtle mode
-document.getElementById('turtle_button').addEventListener('click', function() {
+$('#turtle_button').click( function() {
 	clearTimeout(refresh);
-
-	if (this.className === 'on') port.postMessage({ args: '"alt-speed-enabled": false', method: 'session-set' });
-	else port.postMessage({ args: '"alt-speed-enabled": true', method: 'session-set' });
-
+	port.postMessage({ args: '"alt-speed-enabled": ' + !($(this).attr('class') === 'on'), method: 'session-set' });
 	refreshPopup();
-}, false);
+});

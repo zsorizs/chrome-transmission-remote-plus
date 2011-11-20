@@ -1,3 +1,5 @@
+//chrome-extension://hniolkcjkcfecgnhgpmeddfhndceheci/popup.html
+
 function Torrent() {
 	this.id = 0,
 	this.name = '',
@@ -14,29 +16,33 @@ function Torrent() {
 			port.postMessage({ args: '"ids": [ ' + this.id + ' ]', method: method });
 		}
 
-		if (method === 'torrent-stop') setTimeout(refreshPopup, 500);
-		else refreshPopup();
+		if (method === 'torrent-stop') {
+			setTimeout(refreshPopup, 500);
+		} else {
+			refreshPopup();
+		}
 	}
 
 	// test the torrent name against the current filter and set whether it's visible or not
 	this.filter = function(order) {
-		var filter = !localStorage.torrentFilter ? '' : new RegExp(localStorage.torrentFilter.replace(/ /g, '[^A-z0-9]*'), 'i'),
-			type = localStorage.torrentType,
-			listElem = document.getElementById('list'), hiddenListElem = document.getElementById('list_hidden');
+		var filter = !localStorage.torrentFilter ? '' : new RegExp(localStorage.torrentFilter.replace(/ /g, '[^A-z0-9]*'), 'i')
+		,	type = localStorage.torrentType
+		,	listElem = $('#list')[0]
+		;
 
 		// append to the visible table or the hidden table
 		if ((type == 0 || this.status == type) && this.name.search(filter) > -1) {
 			listElem.insertBefore(this.elem, listElem.childNodes[order]);
 		} else {
-			hiddenListElem.appendChild(this.elem);
+			$('#list_hidden').append(this.elem);
 		}
 	}
 
 	// create the list element and update torrent properties
 	this.createElem = function(props) {
-		if (typeof props.id !== 'undefined') this.id = props.id;
-		if (typeof props.name !== 'undefined') this.name = props.name;
-		if (typeof props.status !== 'undefined') this.status = props.status;
+		if (!!props.id) this.id = props.id;
+		if (!!props.name) this.name = props.name;
+		if (!!props.status) this.status = props.status;
 
 		var thisTorrent = this,
 			percentDone = 100 - (props.leftUntilDone / props.sizeWhenDone * 100),
@@ -56,38 +62,38 @@ function Torrent() {
 		this.elem.appendChild(resumeElem);
 		this.elem.appendChild(removeElem);
 
-		nameElem.setAttribute('class', 'torrent_name');
+		nameElem.className = 'torrent_name';
 		nameElem.setAttribute('title', props.name + '\n\nDownloaded to: ' + props.downloadDir);
-		nameElem.appendChild(document.createTextNode(props.name));
+		nameElem.innerHTML = props.name;
 
 		statsElem.appendChild(speedsElem);
-		statsElem.setAttribute('class', 'torrent_stats');
+		statsElem.className = 'torrent_stats';
 
-		speedsElem.setAttribute('class', 'torrent_speeds');
+		speedsElem.className = 'torrent_speeds';
 
 		progressElem.appendChild(curProgressElem);
-		progressElem.setAttribute('class', 'torrent_progress');
+		progressElem.className = 'torrent_progress';
 
 		if (percentDone === 100) {
-			curProgressElem.setAttribute('class', 'complete');
-			curProgressElem.setAttribute('style', 'width: ' + percentDone + '%');
+			curProgressElem.className = 'complete';
+			$(curProgressElem).css('width', percentDone + '%');
 		} else if (percentDone > 0) {
-			curProgressElem.setAttribute('class', 'downloading');
-			curProgressElem.setAttribute('style', 'width: ' + percentDone + '%');
+			curProgressElem.className = 'downloading';
+			$(curProgressElem).css('width', percentDone + '%');
 		} else {
-			curProgressElem.setAttribute('style', 'display: none');
+			$(curProgressElem).hide();
 		}
 
-		pauseElem.setAttribute('class', 'torrent_button pause');
+		pauseElem.className = 'torrent_button pause';
 		pauseElem.setAttribute('title', 'Pause');
 		pauseElem.addEventListener('click', function() { thisTorrent.sendRPC('torrent-stop'); }, true);
 
-		resumeElem.setAttribute('class', 'torrent_button resume');
+		resumeElem.className = 'torrent_button resume';
 		resumeElem.setAttribute('title', 'Resume');
 		resumeElem.addEventListener('click', function() { thisTorrent.sendRPC('torrent-start'); }, true);
 
 		removeElem.setAttribute('name', 'torrent_remove');
-		removeElem.setAttribute('class', 'torrent_button remove');
+		removeElem.className = 'torrent_button remove';
 		removeElem.setAttribute('title', 'Double-click to remove torrent\n\nHold down CTRL to also delete data');
 		removeElem.addEventListener('dblclick', function() { thisTorrent.sendRPC('torrent-remove', event.ctrlKey); }, true);
 
@@ -98,9 +104,9 @@ function Torrent() {
 				formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) +
 				' (' + percentDone.toFixed(2) + '%) - waiting to verify local data'
 			));
-			speedsElem.appendChild(document.createTextNode(''));
-			pauseElem.setAttribute('style', 'display: none');
-			resumeElem.setAttribute('style', 'display: none');
+			speedsElem.innerHTML = '';
+			$(pauseElem).hide();
+			$(resumeElem).hide();
 
 			break;
 		case 2:
@@ -108,9 +114,10 @@ function Torrent() {
 				formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) +
 				' (' + percentDone.toFixed(2) + '%) - verifying local data (' + (props.recheckProgress * 100).toFixed() + '%)'
 			));
-			speedsElem.appendChild(document.createTextNode(''));
-			pauseElem.setAttribute('style', 'display: none');
-			resumeElem.setAttribute('style', 'display: none');
+			speedsElem.innerHTML = '';
+
+			$(pauseElem).hide();
+			$(resumeElem).hide();
 
 			break;
 		case 4:
@@ -118,20 +125,17 @@ function Torrent() {
 				statsElem.appendChild(document.createTextNode('\
 					Magnetized transfer - retrieving metadata (' + (props.metadataPercentComplete * 100).toFixed() + '%)'
 				));
-				speedsElem.appendChild(document.createTextNode(''));
-				progressElem.setAttribute('class', 'torrent_progress magnetizing');
+				speedsElem.innerHTML = '';
+				progressElem.className = 'torrent_progress magnetizing';
 			} else {
 				statsElem.appendChild(document.createTextNode(
 					formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) +
 					' (' + percentDone.toFixed(2) + '%) - ' + formatSeconds(props.eta) + ' remaining'
 				));
-				speedsElem.appendChild(document.createTextNode('\
-					DL: ' + formatBytes(props.rateDownload) + '/s\
-					UL: ' + formatBytes(props.rateUpload) + '/s'
-				));
+				speedsElem.innerHTML = 'DL: ' + formatBytes(props.rateDownload) + '/s UL: ' + formatBytes(props.rateUpload) + '/s';
 			}
-			pauseElem.setAttribute('style', 'display: block');
-			resumeElem.setAttribute('style', 'display: none');
+			$(pauseElem).show();
+			$(resumeElem).hide();
 
 			break;
 		case 8:
@@ -139,35 +143,32 @@ function Torrent() {
 				formatBytes(props.sizeWhenDone) +
 				' - Seeding, uploaded ' + formatBytes(props.uploadedEver) + ' (Ratio ' + (props.uploadedEver / props.sizeWhenDone).toFixed(2) + ')'
 			));
-			speedsElem.appendChild(document.createTextNode('UL: ' + formatBytes(props.rateUpload) + '/s'));
-			curProgressElem.setAttribute('class', 'seeding');
-			pauseElem.setAttribute('style', 'display: block');
-			resumeElem.setAttribute('style', 'display: none');
+			speedsElem.innerHTML = 'UL: ' + formatBytes(props.rateUpload) + '/s';
+			curProgressElem.className = 'seeding';
+			$(pauseElem).show();
+			$(resumeElem).hide();
 
 			break;
 		case 16:
 			if (props.leftUntilDone) {
 				statsElem.appendChild(document.createTextNode(
-					formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) +
-					' (' + percentDone.toFixed(2) + '%) - Paused'
+					formatBytes(props.sizeWhenDone - props.leftUntilDone)
+					+ ' of ' + formatBytes(props.sizeWhenDone)
+					+ ' (' + percentDone.toFixed(2) + '%) - Paused'
 				));
-				curProgressElem.setAttribute('class', 'paused');
+				curProgressElem.className = 'paused';
+				$(pauseElem).hide();
 			} else {
-				if (props.doneDate > 0) {
-					statsElem.appendChild(document.createTextNode(
-						formatBytes(props.sizeWhenDone) +
-						' - Completed on ' + new Date(props.doneDate * 1000).toLocaleDateString()
-					));
-				} else {
-					statsElem.appendChild(document.createTextNode(
-						formatBytes(props.sizeWhenDone) +
-						' - Completed on ' + new Date(props.addedDate * 1000).toLocaleDateString()
-					));
-				}
+				var done = (props.doneDate > 0) ? props.doneDate : props.addedDate;
+				statsElem.appendChild(document.createTextNode(
+					formatBytes(props.sizeWhenDone)
+					+ ' - Completed on ' + new Date(done * 1000).toLocaleDateString()
+				));
+				$(pauseElem).show();
 			}
-			speedsElem.appendChild(document.createTextNode(''));
-			pauseElem.setAttribute('style', 'display: none');
-			resumeElem.setAttribute('style', 'display: block');
+			speedsElem.innerHTML = '';
+
+			$(resumeElem).show();
 
 			break;
 		}
@@ -178,105 +179,99 @@ function Torrent() {
 		if (typeof props.status !== 'undefined') this.status = props.status;
 
 		var percentDone = 100 - (props.leftUntilDone / props.sizeWhenDone * 100),
-			nameElem = this.elem.childNodes[0],
 			statsElem = this.elem.childNodes[1],
 			speedsElem = statsElem.childNodes[0],
-			progressElem = this.elem.childNodes[2],
-			curProgressElem = progressElem.childNodes[0],
+			progress = $(this.elem.childNodes[2]),
+			progressBar = $(this.elem.childNodes[2].childNodes[0]),
 			pauseElem = this.elem.childNodes[3],
 			resumeElem = this.elem.childNodes[4];
 
-		nameElem.setAttribute('title', props.name + '\n\nDownloaded to: ' + props.downloadDir);
+		//name
+		$(this.elem.childNodes[0]).attr('title', props.name + '\n\nDownloaded to: ' + props.downloadDir);
 
-		progressElem.setAttribute('class', 'torrent_progress');
+		progress.attr('class', 'torrent_progress');
 
 		if (percentDone === 100) {
-			curProgressElem.setAttribute('class', 'complete');
-			curProgressElem.setAttribute('style', 'width: ' + percentDone + '%');
+			progressBar.attr('class', 'complete');
+			progressBar.css('width', percentDone + '%');
 		} else if (percentDone > 0) {
-			curProgressElem.setAttribute('class', 'downloading');
-			curProgressElem.setAttribute('style', 'width: ' + percentDone + '%');
+			progressBar.attr('class', 'downloading');
+			progressBar.css('width', percentDone + '%');
 		} else {
-			curProgressElem.setAttribute('style', 'display: none');
+			progressBar.hide();
 		}
 
 		switch(props.status)
 		{
 		case 1:
-			statsElem.replaceChild(document.createTextNode(
-				formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) +
-				' (' + percentDone.toFixed(2) + '%) - waiting to verify local data'
-			), statsElem.childNodes[1]);
-			speedsElem.replaceChild(document.createTextNode(''), speedsElem.childNodes[0]);
-			pauseElem.setAttribute('style', 'display: none');
-			resumeElem.setAttribute('style', 'display: none');
+			statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone - props.leftUntilDone)
+												+ ' of ' + formatBytes(props.sizeWhenDone)
+												+ ' (' + percentDone.toFixed(2)
+												+ '%) - waiting to verify local data';
+			speedsElem.innerHTML = '';
+
+			$(pauseElem).hide();
+			$(resumeElem).hide();
 
 			break;
 		case 2:
-			statsElem.replaceChild(document.createTextNode(
-				formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) +
-				' (' + percentDone.toFixed(2) + '%) - verifying local data (' + (props.recheckProgress * 100).toFixed() + '%)'
-			), statsElem.childNodes[1]);
-			speedsElem.replaceChild(document.createTextNode(''), speedsElem.childNodes[0]);
-			pauseElem.setAttribute('style', 'display: none');
-			resumeElem.setAttribute('style', 'display: none');
+			statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone - props.leftUntilDone)
+											+ ' of ' + formatBytes(props.sizeWhenDone)
+											+ ' (' + percentDone.toFixed(2)
+											+ '%) - verifying local data ('
+											+ (props.recheckProgress * 100).toFixed() + '%)';
+			speedsElem.innerHTML = "";
+
+			$(pauseElem).hide();
+			$(resumeElem).hide();
 
 			break;
 		case 4:
 			if (props.metadataPercentComplete < 1) {
-				statsElem.replaceChild(document.createTextNode('\
-					Magnetized transfer - retrieving metadata (' + (props.metadataPercentComplete * 100).toFixed() + '%)'
-				), statsElem.childNodes[1]);
-				speedsElem.replaceChild(document.createTextNode(''), speedsElem.childNodes[0]);
-				progressElem.setAttribute('class', 'torrent_progress magnetizing');
+				statsElem.childNodes[1].textContent = 'Magnetized transfer - retrieving metadata ('
+													+ (props.metadataPercentComplete * 100).toFixed() + '%)';
+				speedsElem.innerHTML = '';
+				progress.attr('class', 'torrent_progress magnetizing');
 			} else {
-				statsElem.replaceChild(document.createTextNode(
-					formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) +
-					' (' + percentDone.toFixed(2) + '%) - ' + formatSeconds(props.eta) + ' remaining'
-				), statsElem.childNodes[1]);
-				speedsElem.replaceChild(document.createTextNode('\
-					DL: ' + formatBytes(props.rateDownload) + '/s\
-					UL: ' + formatBytes(props.rateUpload) + '/s'
-				), speedsElem.childNodes[0]);
+				statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone - props.leftUntilDone)
+										+ ' of ' + formatBytes(props.sizeWhenDone)
+										+ ' (' + percentDone.toFixed(2) + '%) - '
+										+ formatSeconds(props.eta) + ' remaining';
+				speedsElem.innerHTML = 'DL: ' + formatBytes(props.rateDownload) + '/s UL: ' + formatBytes(props.rateUpload) + '/s';
 			}
-			pauseElem.setAttribute('style', 'display: block');
-			resumeElem.setAttribute('style', 'display: none');
+
+			$(pauseElem).show();
+			$(resumeElem).hide();
 
 			break;
 		case 8:
-			statsElem.replaceChild(document.createTextNode(
-				formatBytes(props.sizeWhenDone) +
-				' - Seeding, uploaded ' + formatBytes(props.uploadedEver) + ' (Ratio ' + (props.uploadedEver / props.sizeWhenDone).toFixed(2) + ')'
-			), statsElem.childNodes[1]);
-			speedsElem.replaceChild(document.createTextNode('UL: ' + formatBytes(props.rateUpload) + '/s'), speedsElem.childNodes[0]);
-			curProgressElem.setAttribute('class', 'seeding');
-			pauseElem.setAttribute('style', 'display: block');
-			resumeElem.setAttribute('style', 'display: none');
+			statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone)
+											+ ' - Seeding, uploaded ' + formatBytes(props.uploadedEver)
+											+ ' (Ratio ' + (props.uploadedEver / props.sizeWhenDone).toFixed(2) + ')';
+
+			speedsElem.innerHTML = 'UL: ' + formatBytes(props.rateUpload) + '/s';;
+			progressBar.attr('class', 'seeding');
+
+			$(pauseElem).show();
+			$(resumeElem).hide();
 
 			break;
 		case 16:
 			if (props.leftUntilDone) {
-				statsElem.replaceChild(document.createTextNode(
-					formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) +
-					' ('+ percentDone.toFixed(2) + '%) - Paused'
-				), statsElem.childNodes[1]);
-				curProgressElem.setAttribute('class', 'paused');
+				statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone - props.leftUntilDone)
+												+ ' of ' + formatBytes(props.sizeWhenDone)
+												+ ' ('+ percentDone.toFixed(2) + '%) - Paused';
+				progressBar.attr('class', 'paused');
+				$(pauseElem).hide();
 			} else {
-				if (props.doneDate > 0) {
-					statsElem.replaceChild(document.createTextNode(
-						formatBytes(props.sizeWhenDone) +
-						' - Completed on ' + new Date(props.doneDate * 1000).toLocaleDateString()
-					), statsElem.childNodes[1]);
-				} else {
-					statsElem.replaceChild(document.createTextNode(
-						formatBytes(props.sizeWhenDone) +
-						' - Completed on ' + new Date(props.addedDate * 1000).toLocaleDateString()
-					), statsElem.childNodes[1]);
-				}
+				var done = (props.doneDate > 0) ? props.doneDate : props.addedDate;
+				statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone)
+												+ ' - Completed on ' + new Date(done * 1000).toLocaleDateString();
+				$(pauseElem).show();
 			}
-			speedsElem.replaceChild(document.createTextNode(''), speedsElem.childNodes[0]);
-			pauseElem.setAttribute('style', 'display: none');
-			resumeElem.setAttribute('style', 'display: block');
+			speedsElem.innerHTML = '';
+
+			$(resumeElem).show();
 
 			break;
 		}

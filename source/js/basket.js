@@ -40,7 +40,7 @@ function discard(e) {
 }
 
 (function () {
-	var dropbox = document.getElementById('dropbox');
+	var dropbox = $('#dropbox');
 
 	window.onUnload = function () {
 		chrome.browserAction.setBadgeText({ text: '' });
@@ -51,6 +51,6 @@ function discard(e) {
 	dropbox.addEventListener('drop', drop, false);
 
 	dropbox.addEventListener('click', function (e) {
-		document.getElementById('hFile').click();
+		$('#hFile').click();
 	}, false);
 })();

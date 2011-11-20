@@ -4,6 +4,7 @@
 
 <title>Save Torrent</title>
 <link rel="stylesheet" type="text/css" href="css/downloadTorrent.css" />
+<script type="text/javascript" src="js/jquery-1.7.min.js"></script>
 
 </head>
 
@@ -130,24 +131,24 @@ chrome.extension.onRequest.addListener(function (request, sender) {
 		return list;
 	}
 
-	document.getElementById('checkAll').addEventListener('change', function(e) {
+	$('#checkAll').change( function(e) {
 		for(var i = 0, l = boxes.length; i < l; i++) {
 			boxes.item(i).checked = e.target.checked;
 		}
-	}, false);
+	});
 
-	document.getElementById('save').addEventListener('click', function (e) {
+	$('save').click( function (e) {
 		chrome.extension.sendRequest({
 				'data': request.data
 			,	'dir': select.options[select.selectedIndex].value
 			,	'blacklist': getNotSelectedFilesIds() // "files-wanted" not work for some reason
 		});
 		window.close();
-	}, false);
+	});
 
-	document.getElementById('cancel').addEventListener('click', function (e) {
+	$('cancel').click( function (e) {
 		window.close();
-	}, false);
+	});
 });
 
 function decodeBytes(bytes, encoding) {
