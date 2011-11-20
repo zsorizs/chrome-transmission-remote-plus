@@ -163,7 +163,7 @@ input[type="text"] {
 }
 
 #list {
-	height: 100%;
+	min-height: 100%;
 	margin: 0;
 	padding: 0;
 	border: 1px solid #555;
@@ -176,7 +176,7 @@ input[type="text"] {
 #list li {
 	position: relative;
 	border-bottom: 1px solid #ccc;
-	padding: 2px 7px 5px 5px;
+	padding: 2px 7px 4px 5px;
 	background-color: #fff;
 	line-height: 14px;
 	white-space: nowrap;
@@ -197,12 +197,17 @@ input[type="text"] {
 }
 
 .torrent_stats {
+	display: inline-block;
 	font-size: 9px;
 	color: #666;
 }
 
 .torrent_speeds {
-	float: right;
+	display: inline-block;
+	position: absolute;
+	right: 5px;
+	font-size: 9px;
+	color: #666;
 }
 
 .torrent_progress {
@@ -219,7 +224,7 @@ input[type="text"] {
 
 .torrent_progress div {
 	position: relative;
-	top: -1px;
+	top: -2px;
 	left: -1px;
 	-webkit-transition: width 1.0s;
 	height: 10px;
