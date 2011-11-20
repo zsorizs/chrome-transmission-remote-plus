@@ -1,6 +1,14 @@
 //chrome-extension://hniolkcjkcfecgnhgpmeddfhndceheci/popup.html
 
 function Torrent() {
+
+	const	TORRENT_WAIT_VERIFY	= 1
+	,		TORRENT_VERIFING	= 2
+	,		TORRENT_DOWNLOADING	= 4
+	,		TORRENT_SEEDING		= 8
+	,		TORRENT_PAUSED		= 16
+	;
+
 	this.id = 0;
 	this.name = '';
 	this.status = 0;
@@ -10,7 +18,7 @@ function Torrent() {
 	this.sendRPC = function(method, ctrlDown) {
 		clearTimeout(refresh);
 
-		var deleteCmd = method === 'torrent-remove' && ctrlDown ? ', "delete-local-data": true' : '';
+		var deleteCmd = (method === 'torrent-remove' && ctrlDown) ? ', "delete-local-data": true' : '';
 
 		port.postMessage({ args: '"ids": [ ' + this.id + ' ]' + deleteCmd, method: method });
 
@@ -18,15 +26,15 @@ function Torrent() {
 	};
 
 	// test the torrent name against the current filter and set whether it's visible or not
-	this.filter = function(order) {
-		var filter = !localStorage.torrentFilter ? '' : new RegExp(localStorage.torrentFilter.replace(/ /g, '[^A-z0-9]*'), 'i')
-		,	type = localStorage.torrentType
-		,	listElem = $('#list')[0]
+	this.filter = function() {
+		var filter = !localStorage.torrentFilter
+						? ''
+						: new RegExp(localStorage.torrentFilter.replace(/ /g, '[^A-z0-9]*'), 'i')
+		,	type = localStorage.torrentType || 0
 		;
 
-		// append to the visible table or the hidden table
 		if ((type == 0 || this.status == type) && this.name.search(filter) > -1) {
-			listElem.insertBefore(this.elem, listElem.childNodes[order]);
+			$('#list').append(this.elem);
 		} else {
 			$('#list_hidden').append(this.elem);
 		}
@@ -91,80 +99,64 @@ function Torrent() {
 		removeElem.setAttribute('title', 'Double-click to remove torrent\n\nHold down CTRL to also delete data');
 		removeElem.addEventListener('dblclick', function() { thisTorrent.sendRPC('torrent-remove', event.ctrlKey); }, true);
 
-		switch(props.status)
-		{
-		case 1:
-			statsElem.appendChild(document.createTextNode(
-				formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) +
-				' (' + percentDone.toFixed(2) + '%) - waiting to verify local data'
-			));
-			speedsElem.innerHTML = '';
-			$(pauseElem).hide();
-			$(resumeElem).hide();
+		$(pauseElem).toggle(props.status === TORRENT_DOWNLOADING || props.status === TORRENT_SEEDING);
+		$(resumeElem).toggle(props.status === TORRENT_PAUSED);
 
-			break;
-		case 2:
-			statsElem.appendChild(document.createTextNode(
-				formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) +
-				' (' + percentDone.toFixed(2) + '%) - verifying local data (' + (props.recheckProgress * 100).toFixed() + '%)'
-			));
-			speedsElem.innerHTML = '';
-
-			$(pauseElem).hide();
-			$(resumeElem).hide();
-
-			break;
-		case 4:
-			if (props.metadataPercentComplete < 1) {
-				statsElem.appendChild(document.createTextNode('\
-					Magnetized transfer - retrieving metadata (' + (props.metadataPercentComplete * 100).toFixed() + '%)'
-				));
-				speedsElem.innerHTML = '';
-				progressElem.className = 'torrent_progress magnetizing';
-			} else {
+		switch(props.status) {
+			case TORRENT_WAIT_VERIFY:
 				statsElem.appendChild(document.createTextNode(
 					formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) +
-					' (' + percentDone.toFixed(2) + '%) - ' + formatSeconds(props.eta) + ' remaining'
+					' (' + percentDone.toFixed(2) + '%) - waiting to verify local data'
 				));
-				speedsElem.innerHTML = 'DL: ' + formatBytes(props.rateDownload) + '/s UL: ' + formatBytes(props.rateUpload) + '/s';
-			}
-			$(pauseElem).show();
-			$(resumeElem).hide();
-
+				speedsElem.innerHTML = '';
 			break;
-		case 8:
-			statsElem.appendChild(document.createTextNode(
-				formatBytes(props.sizeWhenDone)
-				+ ' - Seeding, uploaded ' + formatBytes(props.uploadedEver)
-				+ ' (Ratio ' + (props.uploadedEver / props.sizeWhenDone).toFixed(2) + ')'
-			));
-			speedsElem.innerHTML = 'UL: ' + formatBytes(props.rateUpload) + '/s';
-			curProgressElem.className = 'seeding';
-			$(pauseElem).show();
-			$(resumeElem).hide();
-
-			break;
-		case 16:
-			if (props.leftUntilDone) {
+			case TORRENT_VERIFING:
 				statsElem.appendChild(document.createTextNode(
-					formatBytes(props.sizeWhenDone - props.leftUntilDone)
-					+ ' of ' + formatBytes(props.sizeWhenDone)
-					+ ' (' + percentDone.toFixed(2) + '%) - Paused'
+					formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) +
+					' (' + percentDone.toFixed(2) + '%) - verifying local data (' + (props.recheckProgress * 100).toFixed() + '%)'
 				));
-				$(pauseElem).hide();
-			} else {
-				var done = (props.doneDate > 0) ? props.doneDate : props.addedDate;
+				speedsElem.innerHTML = '';
+			break;
+			case TORRENT_DOWNLOADING:
+				if (props.metadataPercentComplete < 1) {
+					statsElem.appendChild(document.createTextNode('\
+						Magnetized transfer - retrieving metadata (' + (props.metadataPercentComplete * 100).toFixed() + '%)'
+					));
+					speedsElem.innerHTML = '';
+					progressElem.className = 'torrent_progress magnetizing';
+				} else {
+					statsElem.appendChild(document.createTextNode(
+						formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) +
+						' (' + percentDone.toFixed(2) + '%) - ' + formatSeconds(props.eta) + ' remaining'
+					));
+					speedsElem.innerHTML = 'DL: ' + formatBytes(props.rateDownload) + '/s UL: ' + formatBytes(props.rateUpload) + '/s';
+				}
+			break;
+			case TORRENT_SEEDING:
 				statsElem.appendChild(document.createTextNode(
 					formatBytes(props.sizeWhenDone)
-					+ ' - Completed on ' + new Date(done * 1000).toLocaleDateString()
+					+ ' - Seeding, uploaded ' + formatBytes(props.uploadedEver)
+					+ ' (Ratio ' + (props.uploadedEver / props.sizeWhenDone).toFixed(2) + ')'
 				));
-				$(pauseElem).show();
-			}
-			speedsElem.innerHTML = '';
-
-			curProgressElem.className = 'paused';
-			$(resumeElem).show();
-
+				speedsElem.innerHTML = 'UL: ' + formatBytes(props.rateUpload) + '/s';
+				$(curProgressElem).attr('class', 'seeding');
+			break;
+			case TORRENT_PAUSED:
+				if (props.leftUntilDone) {
+					statsElem.appendChild(document.createTextNode(
+						formatBytes(props.sizeWhenDone - props.leftUntilDone)
+						+ ' of ' + formatBytes(props.sizeWhenDone)
+						+ ' (' + percentDone.toFixed(2) + '%) - Paused'
+					));
+				} else {
+					var done = (props.doneDate > 0) ? props.doneDate : props.addedDate;
+					statsElem.appendChild(document.createTextNode(
+						formatBytes(props.sizeWhenDone)
+						+ ' - Completed on ' + new Date(done * 1000).toLocaleDateString()
+					));
+				}
+				speedsElem.innerHTML = '';
+				curProgressElem.className = 'paused';
 			break;
 		}
 	};
@@ -196,78 +188,60 @@ function Torrent() {
 			progressBar.hide();
 		}
 
-		switch(props.status)
-		{
-		case 1:
-			statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone - props.leftUntilDone)
+		$(pauseElem).toggle(props.status === TORRENT_DOWNLOADING || props.status === TORRENT_SEEDING);
+		$(resumeElem).toggle(props.status === TORRENT_PAUSED);
+
+		switch(props.status) {
+			case TORRENT_WAIT_VERIFY:
+				statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone - props.leftUntilDone)
+													+ ' of ' + formatBytes(props.sizeWhenDone)
+													+ ' (' + percentDone.toFixed(2)
+													+ '%) - waiting to verify local data';
+				speedsElem.innerHTML = '';
+			break;
+			case TORRENT_VERIFING:
+				statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone - props.leftUntilDone)
 												+ ' of ' + formatBytes(props.sizeWhenDone)
 												+ ' (' + percentDone.toFixed(2)
-												+ '%) - waiting to verify local data';
-			speedsElem.innerHTML = '';
-
-			$(pauseElem).hide();
-			$(resumeElem).hide();
-
+												+ '%) - verifying local data ('
+												+ (props.recheckProgress * 100).toFixed() + '%)';
+				speedsElem.innerHTML = "";
 			break;
-		case 2:
-			statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone - props.leftUntilDone)
+			case TORRENT_DOWNLOADING:
+				if (props.metadataPercentComplete < 1) {
+					statsElem.childNodes[1].textContent = 'Magnetized transfer - retrieving metadata ('
+														+ (props.metadataPercentComplete * 100).toFixed() + '%)';
+					speedsElem.innerHTML = '';
+					progress.attr('class', 'torrent_progress magnetizing');
+				} else {
+					statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone - props.leftUntilDone)
 											+ ' of ' + formatBytes(props.sizeWhenDone)
-											+ ' (' + percentDone.toFixed(2)
-											+ '%) - verifying local data ('
-											+ (props.recheckProgress * 100).toFixed() + '%)';
-			speedsElem.innerHTML = "";
-
-			$(pauseElem).hide();
-			$(resumeElem).hide();
-
+											+ ' (' + percentDone.toFixed(2) + '%) - '
+											+ formatSeconds(props.eta) + ' remaining';
+					speedsElem.innerHTML = 'DL: ' + formatBytes(props.rateDownload) + '/s UL: ' + formatBytes(props.rateUpload) + '/s';
+				}
 			break;
-		case 4:
-			if (props.metadataPercentComplete < 1) {
-				statsElem.childNodes[1].textContent = 'Magnetized transfer - retrieving metadata ('
-													+ (props.metadataPercentComplete * 100).toFixed() + '%)';
-				speedsElem.innerHTML = '';
-				progress.attr('class', 'torrent_progress magnetizing');
-			} else {
-				statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone - props.leftUntilDone)
-										+ ' of ' + formatBytes(props.sizeWhenDone)
-										+ ' (' + percentDone.toFixed(2) + '%) - '
-										+ formatSeconds(props.eta) + ' remaining';
-				speedsElem.innerHTML = 'DL: ' + formatBytes(props.rateDownload) + '/s UL: ' + formatBytes(props.rateUpload) + '/s';
-			}
-
-			$(pauseElem).show();
-			$(resumeElem).hide();
-
-			break;
-		case 8:
-			statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone)
-											+ ' - Seeding, uploaded ' + formatBytes(props.uploadedEver)
-											+ ' (Ratio ' + (props.uploadedEver / props.sizeWhenDone).toFixed(2) + ')';
-
-			speedsElem.innerHTML = 'UL: ' + formatBytes(props.rateUpload) + '/s';;
-			progressBar.attr('class', 'seeding');
-
-			$(pauseElem).show();
-			$(resumeElem).hide();
-
-			break;
-		case 16:
-			if (props.leftUntilDone) {
-				statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone - props.leftUntilDone)
-												+ ' of ' + formatBytes(props.sizeWhenDone)
-												+ ' ('+ percentDone.toFixed(2) + '%) - Paused';
-			} else {
-				var done = (props.doneDate > 0) ? props.doneDate : props.addedDate;
+			case TORRENT_SEEDING:
 				statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone)
-												+ ' - Completed on ' + new Date(done * 1000).toLocaleDateString();
-			}
+												+ ' - Seeding, uploaded ' + formatBytes(props.uploadedEver)
+												+ ' (Ratio ' + (props.uploadedEver / props.sizeWhenDone).toFixed(2) + ')';
 
-			progressBar.attr('class', 'paused');
-			speedsElem.innerHTML = '';
+				speedsElem.innerHTML = 'UL: ' + formatBytes(props.rateUpload) + '/s';;
+				progressBar.attr('class', 'seeding');
+			break;
+			case TORRENT_PAUSED:
+				if (props.leftUntilDone) {
+					statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone - props.leftUntilDone)
+													+ ' of ' + formatBytes(props.sizeWhenDone)
+													+ ' ('+ percentDone.toFixed(2) + '%) - Paused';
+				} else {
+					var done = (props.doneDate > 0) ? props.doneDate : props.addedDate;
+					statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone)
+													+ ' - Completed on ' + new Date(done * 1000).toLocaleDateString();
+				}
 
-			$(pauseElem).hide();
-			$(resumeElem).show();
-
+				progressBar.attr('class', 'paused');
+				speedsElem.innerHTML = '';
 			break;
 		}
 	};

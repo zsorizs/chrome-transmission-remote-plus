@@ -257,7 +257,6 @@ input[type="text"] {
 }
 
 .pause {
-	display: none;
 	right: 19px;
 	background-position: 0 0;
 }
@@ -271,7 +270,6 @@ input[type="text"] {
 }
 
 .resume {
-	display: none;
 	right: 19px;
 	background-position: -14px 0;
 }
