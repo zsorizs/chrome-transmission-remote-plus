@@ -157,9 +157,13 @@ input[type="text"] {
 	display: none;
 }
 
-#list {
+#list_wrapper {
 	overflow: auto;
 	max-height: 527px;
+}
+
+#list {
+	height: 100%;
 	margin: 0;
 	padding: 0;
 	border: 1px solid #555;

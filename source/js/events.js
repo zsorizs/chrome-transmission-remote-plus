@@ -86,3 +86,10 @@ $('#turtle_button').click( function() {
 	port.postMessage({ args: '"alt-speed-enabled": ' + !($(this).attr('class') === 'on'), method: 'session-set' });
 	refreshPopup();
 });
+
+$('#list_wrapper').scroll(function(e) {
+	clearTimeout(refresh);
+	if (this.offsetHeight + this.scrollTop === this.scrollHeight) {
+		refresh = setTimeout(refreshPopup, 3000);
+	}
+});
