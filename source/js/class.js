@@ -140,8 +140,9 @@ function Torrent() {
 			break;
 		case 8:
 			statsElem.appendChild(document.createTextNode(
-				formatBytes(props.sizeWhenDone) +
-				' - Seeding, uploaded ' + formatBytes(props.uploadedEver) + ' (Ratio ' + (props.uploadedEver / props.sizeWhenDone).toFixed(2) + ')'
+				formatBytes(props.sizeWhenDone)
+				+ ' - Seeding, uploaded ' + formatBytes(props.uploadedEver)
+				+ ' (Ratio ' + (props.uploadedEver / props.sizeWhenDone).toFixed(2) + ')'
 			));
 			speedsElem.innerHTML = 'UL: ' + formatBytes(props.rateUpload) + '/s';
 			curProgressElem.className = 'seeding';
@@ -156,7 +157,6 @@ function Torrent() {
 					+ ' of ' + formatBytes(props.sizeWhenDone)
 					+ ' (' + percentDone.toFixed(2) + '%) - Paused'
 				));
-				curProgressElem.className = 'paused';
 				$(pauseElem).hide();
 			} else {
 				var done = (props.doneDate > 0) ? props.doneDate : props.addedDate;
@@ -168,6 +168,7 @@ function Torrent() {
 			}
 			speedsElem.innerHTML = '';
 
+			curProgressElem.className = 'paused';
 			$(resumeElem).show();
 
 			break;
@@ -261,16 +262,16 @@ function Torrent() {
 				statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone - props.leftUntilDone)
 												+ ' of ' + formatBytes(props.sizeWhenDone)
 												+ ' ('+ percentDone.toFixed(2) + '%) - Paused';
-				progressBar.attr('class', 'paused');
-				$(pauseElem).hide();
 			} else {
 				var done = (props.doneDate > 0) ? props.doneDate : props.addedDate;
 				statsElem.childNodes[1].textContent = formatBytes(props.sizeWhenDone)
 												+ ' - Completed on ' + new Date(done * 1000).toLocaleDateString();
-				$(pauseElem).show();
 			}
+
+			progressBar.attr('class', 'paused');
 			speedsElem.innerHTML = '';
 
+			$(pauseElem).hide();
 			$(resumeElem).show();
 
 			break;

@@ -4,6 +4,10 @@ var		torrents = []	// array of displayed torrents
 	,	port = chrome.extension.connect({ name: 'popup' })
 	;
 
+const	TAG_BASELINE	= 1
+	,	TAG_UPDATE		= 2
+	,	TAG_TURTLE_MODE	= 3
+	;
 // search for an id in the torrents array
 // returns: index or -1
 Array.prototype.getTorrentById = function(id) {
@@ -106,7 +110,7 @@ function setStatusVisibility() {
 port.onMessage.addListener(function(msg) {
 	switch(msg.tag)
 	{
-	case 1:		// baseline
+	case TAG_BASELINE:
 		var uTorrents = msg.args.torrents.sort(function(a, b) { return b.addedDate - a.addedDate; });
 
 		// add the torrent to the torrents array and set whether it's visible or not
@@ -119,7 +123,7 @@ port.onMessage.addListener(function(msg) {
 		updateStats(uTorrents);
 
 		break;
-	case 2:		// update
+	case TAG_UPDATE:
 		var rTorrents = msg.args.removed
 		,	uTorrents = msg.args.torrents
 		,	torrent
@@ -149,7 +153,7 @@ port.onMessage.addListener(function(msg) {
 		updateStats(uTorrents);
 
 		break;
-	case 3:		//turtle mode
+	case TAG_TURTLE_MODE:
 		$('#turtle_button').toggleClass('on', !!msg.args['alt-speed-enabled']);
 		break;
 	}
@@ -160,9 +164,10 @@ function refreshPopup() {
 	port.postMessage({
 		'args': '"fields": [ "id", "status", "name", "downloadDir", "metadataPercentComplete", "sizeWhenDone", "leftUntilDone", "eta", "rateDownload", "rateUpload", "uploadedEver", "addedDate", "doneDate", "recheckProgress" ], "ids": "recently-active"',
 		'method': 'torrent-get',
-		'tag': 2
+		'tag': TAG_UPDATE
 	});
-	port.postMessage({ 'args': '', 'method': 'session-get', 'tag': 3 });		// check for turtle mode
+
+	port.postMessage({ 'args': '', 'method': 'session-get', 'tag': TAG_TURTLE_MODE });
 
 	refresh = setTimeout(refreshPopup, 3000);
 }
@@ -179,9 +184,10 @@ function refreshPopup() {
 	port.postMessage({
 		'args': '"fields": [ "id", "status", "name", "downloadDir", "metadataPercentComplete", "sizeWhenDone", "leftUntilDone", "eta", "rateDownload", "rateUpload", "uploadedEver", "addedDate", "doneDate", "recheckProgress" ]',
 		'method': 'torrent-get',
-		'tag': 1
+		'tag': TAG_BASELINE
 	});
-	port.postMessage({ 'args': '', 'method': 'session-get', 'tag': 3 });
+
+	port.postMessage({ 'args': '', 'method': 'session-get', 'tag': TAG_TURTLE_MODE });
 
 	refresh = setTimeout(refreshPopup, 3000);
 })();
