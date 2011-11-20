@@ -1,27 +1,21 @@
 //chrome-extension://hniolkcjkcfecgnhgpmeddfhndceheci/popup.html
 
 function Torrent() {
-	this.id = 0,
-	this.name = '',
-	this.status = 0,
-	this.elem = document.createElement('li'),
+	this.id = 0;
+	this.name = '';
+	this.status = 0;
+	this.elem = document.createElement('li');
 
 	// send RPC for a torrent
 	this.sendRPC = function(method, ctrlDown) {
 		clearTimeout(refresh);
 
-		if (method === 'torrent-remove' && ctrlDown) {
-			port.postMessage({ args: '"ids": [ ' + this.id + ' ], "delete-local-data": true', method: method });
-		} else {
-			port.postMessage({ args: '"ids": [ ' + this.id + ' ]', method: method });
-		}
+		var deleteCmd = method === 'torrent-remove' && ctrlDown ? ', "delete-local-data": true' : '';
 
-		if (method === 'torrent-stop') {
-			setTimeout(refreshPopup, 500);
-		} else {
-			refreshPopup();
-		}
-	}
+		port.postMessage({ args: '"ids": [ ' + this.id + ' ]' + deleteCmd, method: method });
+
+		refresh = setTimeout(refreshPopup, method === 'torrent-stop' ? 500 : 0);
+	};
 
 	// test the torrent name against the current filter and set whether it's visible or not
 	this.filter = function(order) {
@@ -36,7 +30,7 @@ function Torrent() {
 		} else {
 			$('#list_hidden').append(this.elem);
 		}
-	}
+	};
 
 	// create the list element and update torrent properties
 	this.createElem = function(props) {
@@ -173,7 +167,7 @@ function Torrent() {
 
 			break;
 		}
-	}
+	};
 
 	// update the list element and update torrent properties
 	this.updateElem = function(props) {
@@ -276,10 +270,10 @@ function Torrent() {
 
 			break;
 		}
-	}
+	};
 
 	// remove the list element for torrent
 	this.removeElem = function() {
 		this.elem.parentNode.removeChild(this.elem);
-	}
+	};
 }

@@ -137,7 +137,7 @@ chrome.extension.onRequest.addListener(function (request, sender) {
 		}
 	});
 
-	$('save').click( function (e) {
+	$('#save').click( function (e) {
 		chrome.extension.sendRequest({
 				'data': request.data
 			,	'dir': select.options[select.selectedIndex].value
@@ -146,7 +146,7 @@ chrome.extension.onRequest.addListener(function (request, sender) {
 		window.close();
 	});
 
-	$('cancel').click( function (e) {
+	$('#cancel').click( function (e) {
 		window.close();
 	});
 });
