@@ -108,53 +108,50 @@ function setStatusVisibility() {
 }
 
 port.onMessage.addListener(function(msg) {
-	switch(msg.tag)
-	{
-	case TAG_BASELINE:
-		var uTorrents = msg.args.torrents.sort(function(a, b) { return b.addedDate - a.addedDate; });
+	switch(msg.tag) {
+		case TAG_BASELINE:
+			var uTorrents = msg.args.torrents.sort(function(a, b) { return b.addedDate - a.addedDate; });
 
-		// add the torrent to the torrents array and set whether it's visible or not
-		for (var i = 0, uTorrent; uTorrent = uTorrents[i]; ++i) {
-			torrents[torrents.push(new Torrent()) - 1].createElem(uTorrent);
-			torrents[i].filter();
-		}
-
-		setStatusVisibility();
-		updateStats(uTorrents);
-
-		break;
-	case TAG_UPDATE:
-		var rTorrents = msg.args.removed
-		,	uTorrents = msg.args.torrents
-		,	torrent
-		;
-
-		// remove torrents
-		for (var i = 0, rTorrent; rTorrent = rTorrents[i]; ++i) {
-			var torrent = torrents.getTorrentById(rTorrent);
-			if (torrent > -1) {
-				torrents.splice(torrent, 1)[0].removeElem();
+			// add the torrent to the torrents array and set whether it's visible or not
+			for (var i = 0, uTorrent; uTorrent = uTorrents[i]; ++i) {
+				torrents[torrents.push(new Torrent()) - 1].createElem(uTorrent);
+				torrents[i].filter();
 			}
-		}
 
-		// add/update torrents
-		for (var i = 0, uTorrent; uTorrent = uTorrents[i]; ++i) {
-			var torrent = torrents.getTorrentById(uTorrent.id);
-			if (torrent < 0) {		// new
-				torrents.unshift(new Torrent());
-				torrents[0].createElem(uTorrent);
-				torrents[0].filter(0);
-			} else {		// existing
-				torrents[torrent].updateElem(uTorrent);
-			}
-		}
-
-		setStatusVisibility();
-		updateStats(uTorrents);
-
+			setStatusVisibility();
+			updateStats(uTorrents);
 		break;
-	case TAG_TURTLE_MODE:
-		$('#turtle_button').toggleClass('on', !!msg.args['alt-speed-enabled']);
+		case TAG_UPDATE:
+			var rTorrents = msg.args.removed
+			,	uTorrents = msg.args.torrents
+			,	torrent
+			;
+
+			// remove torrents
+			for (var i = 0, rTorrent; rTorrent = rTorrents[i]; ++i) {
+				var torrent = torrents.getTorrentById(rTorrent);
+				if (torrent > -1) {
+					torrents.splice(torrent, 1)[0].removeElem();
+				}
+			}
+
+			// add/update torrents
+			for (var i = 0, uTorrent; uTorrent = uTorrents[i]; ++i) {
+				var torrent = torrents.getTorrentById(uTorrent.id);
+				if (torrent < 0) {		// new
+					torrents.unshift(new Torrent());
+					torrents[0].createElem(uTorrent);
+					torrents[0].filter(0);
+				} else {		// existing
+					torrents[torrent].updateElem(uTorrent);
+				}
+			}
+
+			setStatusVisibility();
+			updateStats(uTorrents);
+		break;
+		case TAG_TURTLE_MODE:
+			$('#turtle_button').toggleClass('on', !!msg.args['alt-speed-enabled']);
 		break;
 	}
 });

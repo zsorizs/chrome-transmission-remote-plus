@@ -63,6 +63,16 @@ function decodeString(s) {
 	return r;
 }
 
+function createCheckBox(id) {
+	var chkBox = document.createElement('input');
+	chkBox.type = 'checkbox';
+	chkBox.name = 'chkFile' + id;
+	chkBox.id = 'chkFile' + id;
+	chkBox.defaultChecked = true;
+	chkBox.className = 'listChkBox';
+	return chkBox;
+}
+
 // populate the download popup with the torrent information
 chrome.extension.onRequest.addListener(function (request, sender) {
 	var select = document.getElementById('downloadLocations'),
@@ -99,21 +109,13 @@ chrome.extension.onRequest.addListener(function (request, sender) {
 	// how many files are in the torrent?
 	if (typeof request.torrent.info.files === 'undefined') {		// 1
 		row = table.insertRow(-1);
-
-		row.insertCell(0).appendChild(document.createTextNode(decodeString(name)));
-		row.insertCell(1).appendChild(document.createTextNode(formatBytes(request.torrent.info.length)));
+		row.insertCell(-1).appendChild(createCheckBox(0));
+		row.insertCell(-1).appendChild(document.createTextNode(decodeString(name)));
+		row.insertCell(-1).appendChild(document.createTextNode(formatBytes(request.torrent.info.length)));
 	} else {		// multiple
 		for (var i = 0, file; file = request.torrent.info.files[i]; ++i) {
 			row = table.insertRow(-1);
-
-			var chkBox = document.createElement('input');
-			chkBox.type = 'checkbox';
-			chkBox.name = 'chkFile' + i;
-			chkBox.id = 'chkFile' + i;
-			chkBox.defaultChecked = true;
-			chkBox.className = 'listChkBox';
-
-			row.insertCell(-1).appendChild(chkBox);
+			row.insertCell(-1).appendChild(createCheckBox(i));
 			row.insertCell(-1).appendChild(document.createTextNode(decodeString(file.path.join('/'))));
 			row.insertCell(-1).appendChild(document.createTextNode(formatBytes(file.length)));
 		}
@@ -123,6 +125,7 @@ chrome.extension.onRequest.addListener(function (request, sender) {
 
 	function getNotSelectedFilesIds() {
 		var list = [];
+
 		for(var i = 0, l = boxes.length; i < l; i++) {
 			if(!boxes.item(i).checked) {
 				list.push(i);

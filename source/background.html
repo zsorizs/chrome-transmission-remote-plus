@@ -155,17 +155,16 @@ function dlTorrent(request) {
 	// send the torrent to transmission
 	rpcTransmission(args, 'torrent-add', '', function (response) {
 		// show a badge on the browser icon depending on the response from Transmission
-		switch(response.result)
-		{
-		case 'success':
-			showBadge('add', [0, 255, 0, 255], 5000);
+		switch(response.result) {
+			case 'success':
+				showBadge('add', [0, 255, 0, 255], 5000);
 			break;
-		case 'duplicate torrent':
-			showBadge('dup', [0, 0, 255, 255], 5000);
+			case 'duplicate torrent':
+				showBadge('dup', [0, 0, 255, 255], 5000);
 			break;
-		default:
-			showBadge('fail', [255, 0, 0, 255], 5000);
-			alert('Torrent download failed!\n\n' + response.result);
+			default:
+				showBadge('fail', [255, 0, 0, 255], 5000);
+				alert('Torrent download failed!\n\n' + response.result);
 		}
 	});
 }
@@ -208,50 +207,51 @@ function notificationRefresh() {
 
 // receive messages from other parts of the script
 chrome.extension.onConnect.addListener(function(port) {
-	switch(port.name)
-	{
-	case 'popup':
-		port.onMessage.addListener(function(msg) {
-			switch(msg.method)
-			{
-			case 'torrent-get': case 'session-get':
-				rpcTransmission(msg.args, msg.method, msg.tag, function (response) { port.postMessage({ 'args': response.arguments, 'tag': response.tag }); });
-				break;
-			default:
-				rpcTransmission(msg.args, msg.method);
-			}
-		});
-		break;
-	case 'inject':
-		port.onMessage.addListener(function(msg) {
-			switch(msg.method)
-			{
-			case 'checkLink':
-				for (var i = 0, torrentLink; torrentLink = TORRENT_LINKS[i]; ++i) {
-					if (torrentLink.test(msg.url)) {
-						port.postMessage({ 'url': msg.url, 'num': msg.num, 'method': 'checkLink' });
-						break;
+	switch(port.name) {
+		case 'popup':
+			port.onMessage.addListener(function(msg) {
+				switch(msg.method) {
+					case 'torrent-get': case 'session-get':
+						rpcTransmission(msg.args, msg.method, msg.tag, function (response) {
+							port.postMessage({ 'args': response.arguments, 'tag': response.tag });
+						});
+					break;
+					default:
+						rpcTransmission(msg.args, msg.method);
 					}
 				}
-				break;
-			case 'torrent-add':
-				getTorrent(msg.url);
-				break;
-			case 'checkClick':
-				if (localStorage.clickAction === 'dlremote') {
-					port.postMessage({ 'method': 'checkClick' });
-				}
-			}
-		});
+			);
 		break;
-	case 'options':
-		port.onMessage.addListener(function(msg) {
-			// stop the notification timer
-			clearTimeout(notificationTimer);
+		case 'inject':
+			port.onMessage.addListener(function(msg) {
+				switch(msg.method) {
+					case 'checkLink':
+						for (var i = 0, torrentLink; torrentLink = TORRENT_LINKS[i]; ++i) {
+							if (torrentLink.test(msg.url)) {
+								port.postMessage({ 'url': msg.url, 'num': msg.num, 'method': 'checkLink' });
+								break;
+							}
+						}
+					break;
+					case 'torrent-add':
+						getTorrent(msg.url);
+					break;
+					case 'checkClick':
+						if (localStorage.clickAction === 'dlremote') {
+							port.postMessage({ 'method': 'checkClick' });
+						}
+					break;
+				}
+			});
+		break;
+		case 'options':
+			port.onMessage.addListener(function(msg) {
+				// stop the notification timer
+				clearTimeout(notificationTimer);
 
-			// start it up again if it's enabled
-			if (msg.notifications) notificationRefresh();
-		});
+				// start it up again if it's enabled
+				if (msg.notifications) notificationRefresh();
+			});
 		break;
 	}
 });
@@ -259,7 +259,6 @@ chrome.extension.onConnect.addListener(function(port) {
 // recieve message to send torrent to transmission
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	dlTorrent(request);
-
 	sendResponse({});	// close connection cleanly
 });
 
