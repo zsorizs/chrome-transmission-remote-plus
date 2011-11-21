@@ -43,7 +43,7 @@ $('#filter_input').bind('input', function() {
 // clear the filter when the clear button is clicked
 $('#filter_clear').click( function() {
 	$(this).hide();
-	$('#filter_input').value = '';
+	$('#filter_input').val('');
 	localStorage.torrentFilter = '';
 	applyFilter();
 });

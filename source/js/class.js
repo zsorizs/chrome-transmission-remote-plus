@@ -55,7 +55,7 @@ function Torrent() {
 		oResumeBtn.toggle(status === TORRENT_PAUSED);
 	}
 
-	function adjustLabels(props) {
+	function adjustLabels(props, percentDone) {
 		switch(props.status) {
 			case TORRENT_WAIT_VERIFY:
 				oStats.text(formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone)
@@ -157,9 +157,11 @@ function Torrent() {
 			self.sendRPC('torrent-remove', e.ctrlKey);
 		}).appendTo(oRoot);
 
-		adjustProgress(100 - (props.leftUntilDone / props.sizeWhenDone * 100));
+		var progress = 100 - (props.leftUntilDone / props.sizeWhenDone * 100);
+
+		adjustProgress(progress);
 		adjustButtons(props.status);
-		adjustLabels(props);
+		adjustLabels(props, progress);
 	};
 
 	// update the list element and update torrent properties
@@ -169,9 +171,11 @@ function Torrent() {
 		oName.attr('title', props.name + '\n\nDownloaded to: ' + props.downloadDir);
 		oProgress.attr('class', 'torrent_progress');
 
-		adjustProgress(100 - (props.leftUntilDone / props.sizeWhenDone * 100));
+		var progress = 100 - (props.leftUntilDone / props.sizeWhenDone * 100);
+
+		adjustProgress(progress);
 		adjustButtons(props.status);
-		adjustLabels(props);
+		adjustLabels(props, progress);
 	};
 
 	// remove the list element for torrent

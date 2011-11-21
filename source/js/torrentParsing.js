@@ -80,11 +80,9 @@ function encodeFile(file, callback) {
 function getFile(url, callback) {
 	//TODO: jquery 1.7 and earlier don't support responseType and arraybuffer
 	//http://forum.jquery.com/topic/extending-ajax-addition-of-a-responsehandler
-	var xhr = $.get(url, function(data) {
+	$.get(url, function(data) {
 		//TODO: why 'parseerror' thrown here??
-	}, 'dataview');
-
-	xhr.complete(function(jqXHR, textStatus){
+	}, 'dataview').complete(function(jqXHR, textStatus){
 		var blob = new WebKitBlobBuilder();
 		blob.append(jqXHR.responseText);
 		callback(blob.getBlob());

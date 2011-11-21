@@ -47,29 +47,26 @@ function showBadge(text, color, duration) {
 		nothing
 =================================================================================*/
 function rpcTransmission(args, method, tag, callback) {
-	var xhr = new XMLHttpRequest();
+	$.ajax({
+			url: localStorage.server + localStorage.rpcPath
+		,	type: 'POST'
+		,	username: localStorage.user
+		,	password: localStorage.pass
+		,	headers: {'X-Transmission-Session-Id': localStorage.sessionId}
+		,	data: '{ "arguments": {' + args + '}, "method": "' + method + '"' + (tag ? ', "tag": ' + tag : '') + '}'
+	}).complete(function(jqXHR, textStatus) {
+		var xSid = jqXHR.getResponseHeader('X-Transmission-Session-Id');
 
-	xhr.open('POST', localStorage.server + localStorage.rpcPath, true, localStorage.user, localStorage.pass);
-	xhr.setRequestHeader('X-Transmission-Session-Id', localStorage.sessionId);
-
-	xhr.onreadystatechange = function() { if (xhr.readyState === 4) {
-		if (xhr.getResponseHeader('X-Transmission-Session-Id')) {		// re-request with the correct session id
-			localStorage.sessionId = xhr.getResponseHeader('X-Transmission-Session-Id');
+		if(xSid) {
+			localStorage.sessionId = xSid;
 			return rpcTransmission(args, method, tag, callback);
 		}
 
-		// callback function if there is one
-		if (typeof callback !== 'undefined') {
-			callback(JSON.parse(xhr.responseText));
+		if(callback) {
+			console.debug(JSON.parse(jqXHR.responseText));
+			callback(JSON.parse(jqXHR.responseText));
 		}
-	}};
-
-	// send the RPC request
-	if (typeof tag === 'undefined' || tag === '') {
-		xhr.send('{ "arguments": { ' + args + ' }, "method": "' + method + '" }');
-	} else {
-		xhr.send('{ "arguments": { ' + args + ' }, "method": "' + method + '", "tag": ' + tag + ' }');
-	}
+	});
 }
 
 /*=================================================================================
@@ -211,16 +208,16 @@ chrome.extension.onConnect.addListener(function(port) {
 		case 'popup':
 			port.onMessage.addListener(function(msg) {
 				switch(msg.method) {
-					case 'torrent-get': case 'session-get':
+					case 'torrent-get':
+					case 'session-get':
 						rpcTransmission(msg.args, msg.method, msg.tag, function (response) {
 							port.postMessage({ 'args': response.arguments, 'tag': response.tag });
 						});
 					break;
 					default:
 						rpcTransmission(msg.args, msg.method);
-					}
 				}
-			);
+			});
 		break;
 		case 'inject':
 			port.onMessage.addListener(function(msg) {

@@ -175,7 +175,7 @@ function refreshPopup() {
 
 	var filterValue = localStorage.torrentFilter || "";
 	$('#filter_input').val(filterValue);
-	$('#filter_clear').css('display', !!filterValue ? 'block' : 'none');
+	$('#filter_clear').toggle(!!filterValue);
 
 	// initial baseline of torrents, turtle mode, then start the refresh
 	port.postMessage({
