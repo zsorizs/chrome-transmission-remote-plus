@@ -20,5 +20,5 @@
    "options_page": "options.html",
    "permissions": [ "http://*/", "https://*/", "contextMenus", "notifications", "tabs" ],
    "update_url": "http://clients2.google.com/service/update2/crx",
-   "version": "0.9.2"
+   "version": "0.9.3"
 }

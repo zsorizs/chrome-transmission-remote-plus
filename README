@@ -1,5 +1,13 @@
 Based on Remote Transmission.
 
+version 0.9.3
+- fix filter clear
+- fix display downloading items in list
+
+version 0.9.2
+- fix download list for one item
+- better scrolling in popup
+
 version 0.9.0
 - rename to Remote Transmission Plus
 - fix filter value if not saved in local storage
