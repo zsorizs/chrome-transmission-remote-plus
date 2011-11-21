@@ -4,7 +4,7 @@
 <script type="text/javascript" src="js/bencode.js"></script>
 <script type="text/javascript" src="js/torrentParsing.js"></script>
 <script type="text/javascript" src="js/torrentLinks.js"></script>
-<script type="text/javascript" src="js/jquery-1.7.min.js"></script>
+<script type="text/javascript" src="js/jquery-1.7.js"></script>
 
 <script type="text/javascript">
 
@@ -276,6 +276,7 @@ chrome.contextMenus.create({
 		'title': 'Download with Remote Transmission'
 	,	'contexts': [ 'link' ]
 	,	'onclick': contextMenuClick
+	//TODO: watch this http://code.google.com/p/chromium/issues/detail?id=84024
 	//,	'targetUrlPatterns': TORRENT_LINKS
 });
 /*=================================================================================

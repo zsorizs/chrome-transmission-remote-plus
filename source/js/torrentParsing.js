@@ -78,19 +78,15 @@ function encodeFile(file, callback) {
 		nothing
 =================================================================================*/
 function getFile(url, callback) {
-	var xhr = new XMLHttpRequest();
+	//TODO: jquery 1.7 and earlier don't support responseType and arraybuffer
+	//http://forum.jquery.com/topic/extending-ajax-addition-of-a-responsehandler
+	var xhr = $.get(url, function(data) {
+		//TODO: why 'parseerror' thrown here??
+	}, 'dataview');
 
-	xhr.open('GET', url, true);
-	xhr.overrideMimeType('text/plain; charset=x-user-defined');
-	xhr.responseType = 'arraybuffer';
-
-	xhr.onload = function(e) {
+	xhr.complete(function(jqXHR, textStatus){
 		var blob = new WebKitBlobBuilder();
-
-		blob.append(xhr.response);
-
+		blob.append(jqXHR.responseText);
 		callback(blob.getBlob());
-	};
-
-	xhr.send(null);
+	});
 }
