@@ -21,12 +21,9 @@ function parseTorrent(torrent, callback) {
 			if (ev.data.split) {
 				var data = ev.data.split(":");
 				switch(true) {
-					case data[0] === "debug": {
+					case data[0] === "debug":
 						console.debug(data[1]);
-						break;
-					}
-					default : {
-					}
+					break;
 				}
 			} else {
 				callback(ev.data);

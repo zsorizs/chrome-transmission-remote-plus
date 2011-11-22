@@ -57,13 +57,14 @@ function rpcTransmission(args, method, tag, callback) {
 	}).complete(function(jqXHR, textStatus) {
 		var xSid = jqXHR.getResponseHeader('X-Transmission-Session-Id');
 
+		console.debug(xSid);
+
 		if(xSid) {
 			localStorage.sessionId = xSid;
 			return rpcTransmission(args, method, tag, callback);
 		}
 
 		if(callback) {
-			console.debug(JSON.parse(jqXHR.responseText));
 			callback(JSON.parse(jqXHR.responseText));
 		}
 	});

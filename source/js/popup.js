@@ -8,6 +8,7 @@ const	TAG_BASELINE	= 1
 	,	TAG_UPDATE		= 2
 	,	TAG_TURTLE_MODE	= 3
 	;
+
 // search for an id in the torrents array
 // returns: index or -1
 Array.prototype.getTorrentById = function(id) {

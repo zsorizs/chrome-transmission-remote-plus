@@ -3,14 +3,14 @@
 function Torrent() {
 
 	const	TORRENT_ERROR		= -1
-	,		TORRENT_WAIT_VERIFY	= 1
-	,		TORRENT_VERIFING	= 2
-	,		TORRENT_DOWNLOADING	= 4
-	,		TORRENT_SEEDING		= 8
-	,		TORRENT_PAUSED		= 16
+		,	TORRENT_WAIT_VERIFY	= 1
+		,	TORRENT_VERIFING	= 2
+		,	TORRENT_DOWNLOADING	= 4
+		,	TORRENT_SEEDING		= 8
+		,	TORRENT_PAUSED		= 16
 	;
 
-	var oPauseBtn
+	var	oPauseBtn
 	,	oResumeBtn
 	,	oRemoveBtn
 	,	oProgress
@@ -114,7 +114,9 @@ function Torrent() {
 		this.name = props.name || TORRENT_ERROR;
 		this.status = props.status || TORRENT_ERROR;
 
-		var self = this;
+		var	self = this
+		,	progress = 100 - (props.leftUntilDone / props.sizeWhenDone * 100)
+		;
 
 		oName = $('<div>' + props.name + '</div>').attr({
 				'class': 'torrent_name'
@@ -157,8 +159,6 @@ function Torrent() {
 			self.sendRPC('torrent-remove', e.ctrlKey);
 		}).appendTo(oRoot);
 
-		var progress = 100 - (props.leftUntilDone / props.sizeWhenDone * 100);
-
 		adjustProgress(progress);
 		adjustButtons(props.status);
 		adjustLabels(props, progress);
@@ -166,12 +166,13 @@ function Torrent() {
 
 	// update the list element and update torrent properties
 	this.updateElem = function(props) {
+
+		var progress = 100 - (props.leftUntilDone / props.sizeWhenDone * 100);
+
 		this.status = props.status || TORRENT_ERROR;
 
 		oName.attr('title', props.name + '\n\nDownloaded to: ' + props.downloadDir);
 		oProgress.attr('class', 'torrent_progress');
-
-		var progress = 100 - (props.leftUntilDone / props.sizeWhenDone * 100);
 
 		adjustProgress(progress);
 		adjustButtons(props.status);
