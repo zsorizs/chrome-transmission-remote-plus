@@ -1,5 +1,9 @@
 Based on Remote Transmission.
 
+version 0.9.5
+- fix extension build
+- YUI compressor for js
+
 version 0.9.3
 - fix filter clear
 - fix display downloading items in list

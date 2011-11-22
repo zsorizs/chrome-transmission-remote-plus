@@ -11,10 +11,10 @@ FOR %%G IN (source\js\*.js) DO (
 	java -jar yuicompressor.jar --type js %%G -o dist\%%G -v --charset utf-8 2>>log.txt
 )
 
-FOR %%I IN (source\css\*.css) DO (
+FOR %%G IN (source\css\*.css) DO (
 	echo: >> log.txt
 	echo ### processing %%G >> log.txt
-	java -jar yuicompressor.jar %%I -o dist\%%I -v --charset utf-8 2>>log.txt
+	java -jar yuicompressor.jar --type css %%G -o dist\%%G -v --charset utf-8 2>>log.txt
 )
 
 echo: >> log.txt

@@ -410,14 +410,16 @@ This code can probably be written in a more compact way.
 This code can probably be written in a more compact way.
 }functiongetFile(url,callback){ ---> $ <--- .get(url,function(data){
  
-### processing %G 
+### processing source\css\basket.css 
  
-### processing %G 
+### processing source\css\downloadMagnet.css 
  
-### processing %G 
+### processing source\css\downloadTorrent.css 
  
-### processing %G 
+### processing source\css\options.css 
  
-### processing %G 
+### processing source\css\popup.css 
+ 
 ### compressing dist 
+ 
 ### compressing debug 
