@@ -1,5 +1,8 @@
 Based on Remote Transmission.
 
+version 0.9.6
+- magnet downloading fixed
+
 version 0.9.5
 - fix extension build
 - YUI compressor for js

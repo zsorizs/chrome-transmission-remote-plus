@@ -4,6 +4,7 @@
 
 <title>Save Magnet</title>
 <link rel="stylesheet" type="text/css" href="css/downloadMagnet.css" />
+<script type="text/javascript" src="js/jquery-1.7.js"></script>
 
 </head>
 
@@ -25,37 +26,38 @@
 
 // populate the download popup with the torrent information
 chrome.extension.onRequest.addListener(function (request, sender) {
-	var select = document.getElementById('downloadLocations'), option;
+	var oSelect = $('#downloadLocations');
 
 	// add the list of download directories
 	if (request.dirs.length === 0) {
-		select.disabled = 'disabled';
+		oSelect.attr('disabled', 'disabled');
 
 		// create the default directory download option
-		option = document.createElement('option');
-		option.text = '< Default Directory >';
-		option.value = '';
+		var oOption = $('<option></option>');
+		oOption.text('< Default Directory >');
+		oOption.val('');
 
-		select.add(option, null);
+		oSelect.append(oOption);
 	} else {
 		for (var i = 0, dir; dir = request.dirs[i]; ++i) {
-			option = document.createElement('option');
-			option.text = dir.label;
-			option.value = dir.dir;
 
-			select.add(option, null);
+			var oOption = $('<option></option>');
+			oOption.text(dir.label);
+			oOption.val(dir.dir);
+
+			oSelect.append(oOption, null);
 		}
 	}
 
 	// events
-	document.getElementById('save').addEventListener('click', function (e) {
-		chrome.extension.sendRequest({ 'url': request.url, 'dir': select.options[select.selectedIndex].value });
+	$('#save').click(function (e) {
+		chrome.extension.sendRequest({ 'url': request.url, 'dir': oSelect.val() });
 		window.close();
-	}, false);
+	});
 
-	document.getElementById('cancel').addEventListener('click', function (e) {
+	$('#cancel').click(function (e) {
 		window.close();
-	}, false);
+	});
 });
 
 </script>
