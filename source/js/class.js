@@ -71,7 +71,7 @@ function Torrent() {
 				if (props.metadataPercentComplete < 1) {
 					oStats.text('Magnetized transfer - retrieving metadata (' + (props.metadataPercentComplete * 100).toFixed() + '%)');
 					oSpeeds.text('');
-					oProgressElem.attr('class', 'torrent_progress magnetizing');
+					oProgress.attr('class', 'torrent_progress magnetizing');
 				} else {
 					oStats.text(formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone)
 								+ ' (' + percentDone.toFixed(2) + '%) - ' + formatSeconds(props.eta) + ' remaining');
