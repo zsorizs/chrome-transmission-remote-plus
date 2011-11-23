@@ -144,7 +144,7 @@ function dlTorrent(request) {
 		args += ', "download-dir": "' + request.dir + '"';
 	}
 
-	if(request.blacklist.length) {
+	if(request.blacklist && request.blacklist.length) {
 		args += ', "files-unwanted": [' + request.blacklist.join(',') + ']';
 	}
 
