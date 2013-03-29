@@ -153,13 +153,13 @@ function dlTorrent(request) {
 		// show a badge on the browser icon depending on the response from Transmission
 		switch(response.result) {
 			case 'success':
-				showBadge('add', [0, 255, 0, 255], 5000);
+				showBadge('add', [0, 255, 0, 255], localStorage.browsernotificationtimeout);
 			break;
 			case 'duplicate torrent':
-				showBadge('dup', [0, 0, 255, 255], 5000);
+				showBadge('dup', [0, 0, 255, 255], localStorage.browsernotificationtimeout);
 			break;
 			default:
-				showBadge('fail', [255, 0, 0, 255], 5000);
+				showBadge('fail', [255, 0, 0, 255], localStorage.browsernotificationtimeout);
 				alert('Torrent download failed!\n\n' + response.result);
 		}
 	});
