@@ -78,6 +78,7 @@ function save() {
 	localStorage.pass = document.getElementById('pass').value;
 
 	localStorage.notifications = document.getElementById('notifications').checked;
+	localStorage.browsernotificationtimeout = document.getElementById('browsernotificationtimeout').value;
 
 	// send message to background page to en/disable notifications
 	port.postMessage({ notifications: document.getElementById('notifications').checked });
@@ -109,6 +110,7 @@ function save() {
 		if (typeof localStorage.user === 'undefined') localStorage.user = '';
 		if (typeof localStorage.pass === 'undefined') localStorage.pass = '';
 		if (typeof localStorage.notifications === 'undefined') localStorage.notifications = true;
+		if (typeof localStorage.browsernotificationtimeout === 'undefined') localStorage.browsernotificationtimeout = '1000';
 		if (typeof localStorage.clickAction === 'undefined') localStorage.clickAction = 'dlremote';
 		if (typeof localStorage.dlPopup === 'undefined') localStorage.dlPopup = true;
 
@@ -146,6 +148,7 @@ function save() {
 
 	// general
 	document.getElementById('notifications').checked = (localStorage.notifications === 'true') ? true : false;
+	document.getElementById('browsernotificationtimeout').value = localStorage.browsernotificationtimeout;
 
 	// download
 	document.getElementById(localStorage.clickAction).checked = true;
