@@ -1,13 +1,11 @@
 // global variables
-var		torrents = []	// array of displayed torrents
-	,	refresh			// variable that holds refreshPopup() timeout
-	,	port = chrome.extension.connect({ name: 'popup' })
-	;
+var torrents = [];	// array of displayed torrents
+var refresh;		// variable that holds refreshPopup() timeout
+var port = chrome.extension.connect({ name: 'popup' });
 
-const	TAG_BASELINE	= 1
-	,	TAG_UPDATE		= 2
-	,	TAG_TURTLE_MODE	= 3
-	;
+const TAG_BASELINE	= 1;
+const TAG_UPDATE		= 2;
+const TAG_TURTLE_MODE	= 3;
 
 // search for an id in the torrents array
 // returns: index or -1

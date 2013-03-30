@@ -56,6 +56,9 @@ div.clear {
 	margin-right: 15px;
 	text-align: right;
 }
+label.sectionheader{
+	font-weight: bold;
+}
 
 #container fieldset ul li div.options {
 	float: left;
@@ -117,6 +120,5 @@ div.clear {
 }
 
 #saved {
-	-webkit-transition: opacity 0.3s;
-	opacity: 0;
+	display: none;
 }

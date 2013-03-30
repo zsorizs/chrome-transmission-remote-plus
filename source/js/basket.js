@@ -5,7 +5,7 @@ function addTorrent(file) {
 		if (torrent !== null) {
 			chrome.windows.create({ 'url': 'downloadTorrent.html', 'type': 'popup', 'width': 852, 'height': 583 }, function(window) {
 				encodeFile(file, function(data) {
-					chrome.tabs.sendRequest(window.tabs[0].id, { 'torrent': torrent, 'data': data, 'dirs': dirs });
+					chrome.tabs.sendMessage(window.tabs[0].id, { 'torrent': torrent, 'data': data, 'dirs': dirs });
 				});
 			});
 		} else {

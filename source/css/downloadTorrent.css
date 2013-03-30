@@ -88,7 +88,7 @@ select, button {
 }
 
 #files th.name, #files td.name {
-	width: 80%;
+	width: 65%;
 	overflow: hidden;
 	white-space: nowrap;
 	border-left: 1px solid #d2cfcc;
@@ -100,6 +100,15 @@ select, button {
 }
 
 #files td.size {
+	border-left: 1px solid #bdbdbd;
+}
+
+#files th.priority {
+	width: 15%;
+	border-left: 1px solid #d2cfcc;
+}
+
+#files td.priority {
 	border-left: 1px solid #bdbdbd;
 }
 
@@ -117,4 +126,9 @@ select, button {
 .listChkBox {
 	width: 29px;
 	height: 29px;
+}
+
+.prioChkBox {
+	width: 10px;
+	height: 10px;
 }

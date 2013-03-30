@@ -12,12 +12,9 @@
 =================================================================================*/
 function parseTorrent(torrent, callback) {
 	var reader = new FileReader();
-
 	reader.onload = function (e) {
 		var worker = new Worker('js/bencode.js');
-
 		worker.onmessage = function(ev) {
-
 			if (ev.data.split) {
 				var data = ev.data.split(":");
 				switch(true) {
@@ -29,15 +26,13 @@ function parseTorrent(torrent, callback) {
 				callback(ev.data);
 			}
 		};
-
 		worker.onerror = function(event){
 			throw new Error(event.message + " (" + event.filename + ":" + event.lineno + ")");
 		};
-
 		worker.postMessage(reader.result);
 	};
 
-	reader.readAsBinaryString(torrent);
+	reader.readAsBinaryString(new Blob([torrent], {type: "application/octet-stream"}));
 }
 
 /*=================================================================================
@@ -53,10 +48,11 @@ function parseTorrent(torrent, callback) {
 		nothing
 =================================================================================*/
 function encodeFile(file, callback) {
+	//callback(btoa(unescape(encodeURIComponent( file ))));
 	var reader = new FileReader();
 
 	reader.onload = function (e) {
-		callback(reader.result.replace('data:application/x-bittorrent;base64,', '').replace('data:base64,', ''));
+		callback(reader.result.replace('data:application/x-bittorrent;base64,', '').replace('data:base64,', '').replace('data:;base64,', ''));
 	};
 
 	reader.readAsDataURL(file);
@@ -75,13 +71,13 @@ function encodeFile(file, callback) {
 		nothing
 =================================================================================*/
 function getFile(url, callback) {
-	//TODO: jquery 1.7 and earlier don't support responseType and arraybuffer
-	//http://forum.jquery.com/topic/extending-ajax-addition-of-a-responsehandler
-	$.get(url, function(data) {
-		//TODO: why 'parseerror' thrown here??
-	}, 'dataview').complete(function(jqXHR, textStatus){
-		var blob = new WebKitBlobBuilder();
-		blob.append(jqXHR.responseText);
-		callback(blob.getBlob());
-	});
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', url, true);
+	xhr.responseType = 'blob';
+	xhr.onload = function(e) {
+		if (this.status == 200) {
+			callback(this.response);
+		}
+	};
+	xhr.send();
 }

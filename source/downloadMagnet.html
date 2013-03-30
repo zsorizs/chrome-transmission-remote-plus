@@ -4,7 +4,8 @@
 
 <title>Save Magnet</title>
 <link rel="stylesheet" type="text/css" href="css/downloadMagnet.css" />
-<script type="text/javascript" src="js/jquery-1.7.js"></script>
+<script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="js/downloadMagnet.js"></script>
 
 </head>
 
@@ -21,46 +22,5 @@
 <button id="save">Save</button>
 <button id="cancel">Cancel</button>
 <div class="clear"></div>
-
-<script type="text/javascript">
-
-// populate the download popup with the torrent information
-chrome.extension.onRequest.addListener(function (request, sender) {
-	var oSelect = $('#downloadLocations');
-
-	// add the list of download directories
-	if (request.dirs.length === 0) {
-		oSelect.attr('disabled', 'disabled');
-
-		// create the default directory download option
-		var oOption = $('<option></option>');
-		oOption.text('< Default Directory >');
-		oOption.val('');
-
-		oSelect.append(oOption);
-	} else {
-		for (var i = 0, dir; dir = request.dirs[i]; ++i) {
-
-			var oOption = $('<option></option>');
-			oOption.text(dir.label);
-			oOption.val(dir.dir);
-
-			oSelect.append(oOption, null);
-		}
-	}
-
-	// events
-	$('#save').click(function (e) {
-		chrome.extension.sendRequest({ 'url': request.url, 'dir': oSelect.val() });
-		window.close();
-	});
-
-	$('#cancel').click(function (e) {
-		window.close();
-	});
-});
-
-</script>
-
 </body>
 </html>

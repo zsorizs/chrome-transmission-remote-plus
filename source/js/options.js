@@ -97,11 +97,14 @@ function save() {
 
 	localStorage.dirs = JSON.stringify(dirs);
 
-	document.getElementById('saved').style.opacity = 1.0;
-	setTimeout(function() { document.getElementById('saved').style.opacity = 0; }, 2000);
+	console.log("showing");
+	$("#saved").fadeIn(100);
+	console.log("fading");
+	$("#saved").fadeOut(1000);
+	console.log($("#saved"));
 }
 
-(function() {
+$(function() {
 	// set default options if this is a first time user or a new version
 	if (typeof localStorage.verConfig === 'undefined' || localStorage.verConfig < 5) {
 		if (typeof localStorage.server === 'undefined') localStorage.server = 'http://localhost:9091/transmission';
@@ -163,4 +166,8 @@ function save() {
 	for (var i = 0, dir; dir = dirs[i]; ++i) {
 		addDir(dirs[i].label, dirs[i].dir);
 	}
-})();
+	$("#save").bind("click", save);
+	$("#user,#pass").bind("focus", function(){this.type = 'text';});
+	$("#user,#pass").bind("blur", function(){this.type = 'password';});
+	
+});

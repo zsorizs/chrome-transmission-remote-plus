@@ -23,21 +23,18 @@ function clickTorrent(e) {
 
 // torrent link has been verified as being valid, add click event to it
 port.onMessage.addListener(function(msg) {
-	switch (msg.method)
-	{
-	case 'checkLink':
-		document.links[msg.num].addEventListener('click', clickTorrent, true);
-		break;
-	case 'checkClick':
-		var links = document.links;
-
-		// send each link to the background page for torrent validation
-		for (var i = 0, link; link = links[i]; ++i) {
-			port.postMessage({ 'url': link.href, 'num': i, 'method': 'checkLink' });
-		}
-		break;
+	switch (msg.method) {
+		case 'checkLink':
+			document.links[msg.num].addEventListener('click', clickTorrent, true);
+			break;
+		case 'checkClick':
+			var links = document.links;
+			// send each link to the background page for torrent validation
+			for (var i = 0, link; link = links[i]; ++i) {
+				port.postMessage({ 'url': link.href, 'num': i, 'method': 'checkLink' });
+			}
+			break;
 	}
-	
 });
 
 // checks each link on the page to see if it's a torrent download link
