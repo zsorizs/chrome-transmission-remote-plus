@@ -1,3 +1,15 @@
+Based on Remote Transmission Plus
+
+v0.9.8
++ Added option to set browser icon add/dup/fail timeout.
++ Updated to JQuery v1.9.1.
++ Add file priorities in torrent download popup (credit to Florian Unglaub).
+* Changed to manifest version 2.
+* Clicking on .torrent link when download popup is disabled will not download the file, just send a link to transmission.
+* Fix downloading .torrent file as blob (fixes issue with torrent download popup).
+* Updated sendRequest/onRequest to sendMessage/onMessage (new API in Chrome ~v20+).
++* Probably a few other minor things.
+
 Based on Remote Transmission.
 
 version 0.9.6
