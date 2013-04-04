@@ -1,5 +1,14 @@
 Based on Remote Transmission Plus
 
+v0.9.9
+* Fixed popup menu (inline js error).
+* Slight realignment of progress bars (were off by 1px).
+* Slight alignment of progress bar buttons (occasionally could be off by one pixel).
+* Swapped seeding and complete progress bar colours.
+* Fixed seeding status code, pause button now shows for seeding torrents.
+* Fixed html5 compliance in popup.html.
+* Fixed updating display of torrent that changes state.
+
 v0.9.8
 + Added option to set browser icon add/dup/fail timeout.
 + Updated to JQuery v1.9.1.

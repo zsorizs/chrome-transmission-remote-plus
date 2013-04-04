@@ -2,23 +2,22 @@
 
 function Torrent() {
 
-	const	TORRENT_ERROR		= -1
-		,	TORRENT_WAIT_VERIFY	= 1
-		,	TORRENT_VERIFING	= 2
-		,	TORRENT_DOWNLOADING	= 4
-		,	TORRENT_SEEDING		= 8
-		,	TORRENT_PAUSED		= 16
-	;
+	const	TORRENT_ERROR		= -1;
+	const	TORRENT_PAUSED		= 0;
+	const	TORRENT_WAIT_VERIFY	= 1;
+	const	TORRENT_VERIFING	= 2;
+	const	TORRENT_DOWNLOADING	= 4;
+	const	TORRENT_SEEDING		= 6;
+	//const	TORRENT_PAUSED		= 16;
 
-	var	oPauseBtn
-	,	oResumeBtn
-	,	oRemoveBtn
-	,	oProgress
-	, 	oProgressBar
-	,	oStats
-	,	oSpeeds
-	,	oRoot = $('<li></li>')
-	;
+	var	oPauseBtn;
+	var	oResumeBtn;
+	var	oRemoveBtn;
+	var	oProgress;
+	var	oProgressBar;
+	var	oStats;
+	var	oSpeeds;
+	var	oRoot = $('<li></li>');
 
 	this.id = 0;
 	this.name = '';
@@ -52,7 +51,7 @@ function Torrent() {
 
 	function adjustButtons(status) {
 		oPauseBtn.toggle(status === TORRENT_DOWNLOADING || status === TORRENT_SEEDING);
-		oResumeBtn.toggle(status === TORRENT_PAUSED);
+		oResumeBtn.toggle(status === TORRENT_PAUSED || status === TORRENT_ERROR || status == TORRENT_PAUSED);
 	}
 
 	function adjustLabels(props, percentDone) {
@@ -87,12 +86,13 @@ function Torrent() {
 			case TORRENT_PAUSED:
 				if (props.leftUntilDone) {
 					oStats.text(formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) + ' (' + percentDone.toFixed(2) + '%) - Paused');
+					oProgressBar.attr('class', 'paused');
 				} else {
 					var done = (props.doneDate > 0) ? props.doneDate : props.addedDate;
 					oStats.text(formatBytes(props.sizeWhenDone) + ' - Completed on ' + new Date(done * 1000).toLocaleDateString());
+					oProgressBar.attr('class', 'complete');
 				}
 				oSpeeds.text('');
-				oProgressBar.attr('class', 'paused');
 			break;
 		}
 	}
@@ -138,23 +138,23 @@ function Torrent() {
 		oProgressBar = $('<div></div>').appendTo(oProgress);
 
 		oPauseBtn = $('<div></div>').attr({
-				'class': 'torrent_button pause'
-			,	'title': 'Pause'
+				'class': 'torrent_button pause',
+				'title': 'Pause'
 		}).click(function(e) {
 			self.sendRPC('torrent-stop');
 		}).appendTo(oRoot);
 
 		oResumeBtn = $('<div></div>').attr({
-				'class': 'torrent_button resume'
-			,	'title': 'Resume'
+				'class': 'torrent_button resume',
+				'title': 'Resume'
 		}).click(function() {
 			self.sendRPC('torrent-start');
 		}).appendTo(oRoot);
 
 		oRemoveBtn = $('<div></div>').attr({
-				'name' : 'torrent_remove'
-			,	'class': 'torrent_button remove'
-			,	'title': 'Double-click to remove torrent\n\nHold down CTRL to also delete data'
+				'name' : 'torrent_remove',
+				'class': 'torrent_button remove',
+				'title': 'Double-click to remove torrent\n\nHold down CTRL to also delete data'
 		}).dblclick(function(e) {
 			self.sendRPC('torrent-remove', e.ctrlKey);
 		}).appendTo(oRoot);

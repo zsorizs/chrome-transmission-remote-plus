@@ -97,11 +97,8 @@ function save() {
 
 	localStorage.dirs = JSON.stringify(dirs);
 
-	console.log("showing");
 	$("#saved").fadeIn(100);
-	console.log("fading");
 	$("#saved").fadeOut(1000);
-	console.log($("#saved"));
 }
 
 $(function() {

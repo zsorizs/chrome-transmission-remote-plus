@@ -57,12 +57,11 @@ function formatSeconds(seconds) {
 
 // update the global stats
 function updateStats(uTorrents) {
-	var stats = [0, 0, 0]
-	,	totalDownload = 0
-	,	totalUpload = 0
-	,	list					= $('#list')[0]
-	,	status					= $('#status')[0]
-	;
+	var stats = [0, 0, 0];
+	var totalDownload = 0;
+	var totalUpload = 0;
+	var list		= $('#list')[0];
+	var status		= $('#status')[0];
 
 	// count how many of each status
 	for (var i = 0, torrent; torrent = torrents[i]; ++i) {
@@ -107,6 +106,7 @@ function setStatusVisibility() {
 }
 
 port.onMessage.addListener(function(msg) {
+	console.log(msg);
 	switch(msg.tag) {
 		case TAG_BASELINE:
 			var uTorrents = msg.args.torrents.sort(function(a, b) { return b.addedDate - a.addedDate; });
@@ -121,10 +121,9 @@ port.onMessage.addListener(function(msg) {
 			updateStats(uTorrents);
 		break;
 		case TAG_UPDATE:
-			var rTorrents = msg.args.removed
-			,	uTorrents = msg.args.torrents
-			,	torrent
-			;
+			var rTorrents = msg.args.removed;
+			var uTorrents = msg.args.torrents;
+			var torrent;
 
 			// remove torrents
 			for (var i = 0, rTorrent; rTorrent = rTorrents[i]; ++i) {
@@ -135,13 +134,14 @@ port.onMessage.addListener(function(msg) {
 			}
 
 			// add/update torrents
-			for (var i = 0, uTorrent; uTorrent = uTorrents[i]; ++i) {
+			for (var i = 0; i < uTorrents.length; i++) {
+				var uTorrent = uTorrents[i];
 				var torrent = torrents.getTorrentById(uTorrent.id);
 				if (torrent < 0) {		// new
 					torrents.unshift(new Torrent());
 					torrents[0].createElem(uTorrent);
 					torrents[0].filter(0);
-				} else {		// existing
+				} else {				// existing
 					torrents[torrent].updateElem(uTorrent);
 				}
 			}
@@ -168,7 +168,7 @@ function refreshPopup() {
 	refresh = setTimeout(refreshPopup, 3000);
 }
 
-(function() {
+$(function() {
 	// persistent torrent type dropdown and filter textbox
 	$('#filter_type').val(localStorage.torrentType || 0);
 
@@ -185,5 +185,5 @@ function refreshPopup() {
 
 	port.postMessage({ 'args': '', 'method': 'session-get', 'tag': TAG_TURTLE_MODE });
 
-	refresh = setTimeout(refreshPopup, 3000);
-})();
+	refreshPopup();
+});

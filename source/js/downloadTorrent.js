@@ -66,7 +66,6 @@ function createPriorityCheckboxes(id) {
 function sortFiles(a, b) {
 	var nameA = decodeString(a.path[0].split(' ')[0].toLowerCase());
 	var nameB = decodeString(b.path[0].split(' ')[0].toLowerCase());
-	//console.log("Comparing "+nameA+" to "+nameB);
 
 	if ( nameA > nameB ) {
 		return 1;
@@ -79,7 +78,6 @@ function sortFiles(a, b) {
 
 // populate the download popup with the torrent information
 chrome.extension.onMessage.addListener(function (request, sender) {
-	console.log("something");
 	var select = document.getElementById('downloadLocations');
 	var option;
 	var table = document.getElementById('files');
