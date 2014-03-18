@@ -1,7 +1,8 @@
 
 // global variables
 var completedTorrents = '',		// string of completed torrents to prevent duplicate notifications
-	notificationTimer;			// timer for displaying notifications
+	notificationTimer,
+	torrentInfo = {};			// timer for displaying notifications
 
 /*=================================================================================
  showBadge(string text, RGBA color, milliseconds duration)
@@ -86,9 +87,8 @@ function getTorrent(url) {
 		if (localStorage.dLocation === 'dldefault' && localStorage.dlPopup === 'false') {
 			dlTorrent({ 'url': url });
 		} else {
-			chrome.windows.create({ 'url': 'downloadMagnet.html', 'type': 'popup', 'width': 852, 'height': 138 }, function(window) {
-				chrome.tabs.sendMessage(window.tabs[0].id, { 'url': url, 'dirs': dirs });
-			});
+			torrentInfo['magnet'] = {'url': url, 'dirs': dirs};
+			chrome.windows.create({ 'url': 'downloadMagnet.html', 'type': 'popup', 'width': 852, 'height': 138 });
 		}
 	} else {	//it's a .torrent
 		if (localStorage.dLocation === 'dldefault' && localStorage.dlPopup === 'false') {	//don't show the download popup
@@ -97,17 +97,15 @@ function getTorrent(url) {
 			getFile(url, function(file) {
 				parseTorrent(file, function(torrent) {
 					if (torrent !== null) {
-						chrome.windows.create({
+						encodeFile(file, function(data) {
+							torrentInfo['torrent'] = { 'torrent': torrent, 'data': data, 'dirs': dirs };
+							chrome.windows.create({
 								'url': 'downloadTorrent.html',
 								'type': 'popup',
 								'width': 850,
 								'height': 580,
 								'left': (screen.width/2) - 425,
 								'top': (screen.height/2) - 265,
-							},
-							function(window) {
-								encodeFile(file, function(data) {
-								chrome.tabs.sendMessage(window.tabs[0].id, { 'torrent': torrent, 'data': data, 'dirs': dirs });
 							});
 						});
 					} else {
@@ -263,8 +261,12 @@ chrome.extension.onConnect.addListener(function(port) {
 
 // recieve message to send torrent to transmission
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-	dlTorrent(request);
-	sendResponse({});	// close connection cleanly
+	if(request.method == "get-torrent-info") {
+		sendResponse(torrentInfo[request.page]);
+	}else{
+		dlTorrent(request);
+		sendResponse({});	// close connection cleanly
+	}
 });
 
 /*=================================================================================

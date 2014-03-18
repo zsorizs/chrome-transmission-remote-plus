@@ -1,6 +1,6 @@
 
 // populate the download popup with the torrent information
-chrome.extension.onMessage.addListener(function (request, sender) {
+chrome.extension.sendMessage({ 'method': 'get-torrent-info', 'page': 'magnet' }, function(request) {
 	var oSelect = $('#downloadLocations');
 
 	// add the list of download directories
