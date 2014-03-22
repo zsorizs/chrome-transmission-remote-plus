@@ -77,7 +77,7 @@ function sortFiles(a, b) {
 }
 
 // populate the download popup with the torrent information
-chrome.extension.onMessage.addListener(function (request, sender) {
+chrome.extension.sendMessage({ 'method': 'get-torrent-info', 'page': 'torrent' }, function(request) {
 	var select = document.getElementById('downloadLocations');
 	var option;
 	var table = document.getElementById('files');
