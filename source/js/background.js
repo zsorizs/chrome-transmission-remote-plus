@@ -87,6 +87,7 @@ function getTorrent(url) {
 		if (localStorage.dLocation === 'dldefault' && localStorage.dlPopup === 'false') {
 			dlTorrent({ 'url': url });
 		} else {
+			torrentInfo['magnet'] = { 'dirs': dirs, 'url': url };
 			chrome.windows.create({
 				'url': 'downloadMagnet.html',
 				'type': 'popup',
@@ -94,8 +95,6 @@ function getTorrent(url) {
 				'height': 138,
 				'left': screen.width/2 - 852/2,
 				'top': screen.height/2 - 138/2
-			}, function(window) {
-				chrome.tabs.sendMessage(window.tabs[0].id, { 'url': url, 'dirs': dirs });
 			});
 		}
 	} else {	//it's a .torrent
