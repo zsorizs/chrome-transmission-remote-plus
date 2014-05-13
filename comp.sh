@@ -16,11 +16,20 @@ do
 	fi
 done
 
+echo "Creating debug .crx" | tee -a log.txt
+google-chrome --pack-extension=source/ --pack-extension-key=debug.pem | tee -a log.txt
+mv source.crx debug.crx
+
+echo "Compressing debug" | tee -a log.txt
+(cd source; zip -r -9 ../debug.zip *) 2>>log.txt
+
+
+[ "$1" = "dist" ] || exit 0
+
 mkdir "dist"
 cp -R "./source" "./dist/"
 
 echo "Processing javascript files..." | tee -a log.txt
-#for i in ./source/js/*.js
 for i in ./dist/source/js/*.js
 do
 	echo "### Processing $i" | tee -a log.txt
@@ -36,11 +45,10 @@ do
 done
 
 echo "Compressing dist" | tee -a log.txt
-7z a -tzip -mx=9 dist.zip ./dist/source/* 2>>log.txt 
+(cd dist/source; zip -r -9 ../../dist.zip *) 2>>log.txt
 
-echo "Compressing debug" | tee -a log.txt
-7z a -tzip -mx=9 debug.zip ./source/* 2>>log.txt 
-
-rm -rf "dist"
+echo "Creating dist .crx" | tee -a log.txt
+google-chrome --pack-extension=dist/source --pack-extension-key=dist.pem | tee -a log.txt
+mv dist/source.crx dist.crx
 
 less < log.txt
