@@ -92,9 +92,9 @@ function getTorrent(url) {
 				'url': 'downloadMagnet.html',
 				'type': 'popup',
 				'width': 852,
-				'height': 138,
+				'height': 160,
 				'left': screen.width/2 - 852/2,
-				'top': screen.height/2 - 138/2
+				'top': screen.height/2 - 160/2
 			});
 		}
 	} else {	//it's a .torrent
