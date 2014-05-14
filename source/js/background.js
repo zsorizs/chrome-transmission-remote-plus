@@ -18,10 +18,41 @@ var completedTorrents = '',		// string of completed torrents to prevent duplicat
 	nothing
 =================================================================================*/
 function showBadge(text, color, duration) {
+
+	duration = (duration == undefined) ? localStorage.browserbadgetimeout : duration;
+
 	chrome.browserAction.setBadgeBackgroundColor({ color: color });
 	chrome.browserAction.setBadgeText({ text: text });
 
 	setTimeout(function () { chrome.browserAction.setBadgeText({ 'text': '' }); }, duration);
+}
+
+/*=================================================================================
+ showNotification(string title, string message)
+
+ displays a text badge on the browser icon
+
+ parameters
+	message: (required) title of notification
+	   text: (required) text to display
+
+ returns
+	nothing
+=================================================================================*/
+function showNotification(title, message) {
+
+	var options = {
+		type: "basic",
+		title: title,
+		message: message,
+		iconUrl: "images/icon128.png"
+	};
+
+	var creationCallback = function() { /* Error checking goes here */ };
+
+	if (localStorage.notificationsnewtorrent == "true") {
+		chrome.notifications.create("tadd", options, creationCallback);
+	}
 }
 
 /*=================================================================================
@@ -167,13 +198,16 @@ function dlTorrent(request) {
 		// show a badge on the browser icon depending on the response from Transmission
 		switch(response.result) {
 			case 'success':
-				showBadge('add', [0, 255, 0, 255], localStorage.browsernotificationtimeout);
+				showBadge('add', [0, 255, 0, 255]);
+				showNotification("Torrent added successfully", response.arguments["torrent-added"].name);
 			break;
 			case 'duplicate torrent':
-				showBadge('dup', [0, 0, 255, 255], localStorage.browsernotificationtimeout);
+				showBadge('dup', [0, 0, 255, 255]);
+				showNotification("Duplicate torrent", "");
 			break;
 			default:
-				showBadge('fail', [255, 0, 0, 255], localStorage.browsernotificationtimeout);
+				showBadge('fail', [255, 0, 0, 255]);
+				showNotification("Adding torrent failed", "");
 				alert('Torrent download failed!\n\n' + response.result);
 		}
 	});
@@ -298,7 +332,7 @@ chrome.contextMenus.create({
 
 (function() {
 	// show notifications if they're enabled
-	if (localStorage.notifications === 'true') {
+	if (localStorage.notificationstorrentfinished === 'true') {
 		notificationRefresh();
 	}
 

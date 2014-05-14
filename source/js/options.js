@@ -77,11 +77,14 @@ function save() {
 	localStorage.user = document.getElementById('user').value;
 	localStorage.pass = document.getElementById('pass').value;
 
-	localStorage.notifications = document.getElementById('notifications').checked;
-	localStorage.browsernotificationtimeout = document.getElementById('browsernotificationtimeout').value;
+	localStorage.notificationstorrentfinished = document.getElementById('notificationstorrentfinished').checked;
+	localStorage.notificationsnewtorrent = document.getElementById('notificationsnewtorrent').checked;
+
+	localStorage.browserbadgetimeout = document.getElementById('browserbadgetimeout').value;
 
 	// send message to background page to en/disable notifications
-	port.postMessage({ notifications: document.getElementById('notifications').checked });
+	port.postMessage({ notificationstorrentfinished: document.getElementById('notificationstorrentfinished').checked });
+	port.postMessage({ notificationsnewtorrent: document.getElementById('notificationsnewtorrent').checked });
 
 	localStorage.clickAction = (document.getElementById('dlremote').checked) ? 'dlremote' : 'dllocal';
 
@@ -109,8 +112,9 @@ $(function() {
 		if (typeof localStorage.webPath === 'undefined') localStorage.webPath = '/web/';
 		if (typeof localStorage.user === 'undefined') localStorage.user = '';
 		if (typeof localStorage.pass === 'undefined') localStorage.pass = '';
-		if (typeof localStorage.notifications === 'undefined') localStorage.notifications = true;
-		if (typeof localStorage.browsernotificationtimeout === 'undefined') localStorage.browsernotificationtimeout = '1000';
+		if (typeof localStorage.notificationstorrentfinished === 'undefined') localStorage.notificationstorrentfinished = true;
+		if (typeof localStorage.notificationsnewtorrent === 'undefined') localStorage.notificationsnewtorrent = false;
+		if (typeof localStorage.browserbadgetimeout === 'undefined') localStorage.browserbadgetimeout = '1000';
 		if (typeof localStorage.clickAction === 'undefined') localStorage.clickAction = 'dlremote';
 		if (typeof localStorage.dlPopup === 'undefined') localStorage.dlPopup = true;
 
@@ -147,8 +151,10 @@ $(function() {
 	document.getElementById('pass').value = localStorage.pass;
 
 	// general
-	document.getElementById('notifications').checked = (localStorage.notifications === 'true') ? true : false;
-	document.getElementById('browsernotificationtimeout').value = localStorage.browsernotificationtimeout;
+	document.getElementById('notificationstorrentfinished').checked = (localStorage.notificationstorrentfinished === 'true') ? true : false;
+	document.getElementById('notificationsnewtorrent').checked = (localStorage.notificationsnewtorrent === 'true') ? true : false;
+
+	document.getElementById('browserbadgetimeout').value = localStorage.browserbadgetimeout;
 
 	// download
 	document.getElementById(localStorage.clickAction).checked = true;

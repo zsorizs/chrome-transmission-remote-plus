@@ -51,19 +51,27 @@
 		<legend>General</legend>
 		<ul>
 			<li>
-				<label class="section" for="notifications">
+				<label class="section" for="notificationstorrentfinished">
 					Desktop Notification<br />
 					<span class="small">(when a torrent finishes)</span>
 				</label>
-				<input id="notifications" type="checkbox" />
+				<input id="notificationstorrentfinished" type="checkbox" />
 				<div class="clear"></div>
 			</li>
 			<li>
-				<label class="section" for="browsernotificationtimeout">
+				<label class="section" for="notificationsnewtorrent">
+					Desktop Notification<br />
+					<span class="small">(when adding new torrents)</span>
+				</label>
+				<input id="notificationsnewtorrent" type="checkbox" />
+				<div class="clear"></div>
+			</li>
+			<li>
+				<label class="section" for="browserbadgetimeout">
 					Icon Notification Timeout<br />
 					<span class="small">(how long add/dup/fail is shown)</span>
 				</label>
-				<select id="browsernotificationtimeout">
+				<select id="browserbadgetimeout">
 					<option value="100">100ms</option>
 					<option value="250">250ms</option>
 					<option value="500">500ms</option>
