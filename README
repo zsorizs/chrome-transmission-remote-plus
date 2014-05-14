@@ -1,5 +1,9 @@
 Based on Remote Transmission Plus
 
+v0.9.9.3
+* Bugs fixed. Patches merged.
++ Add browser notification when adding torrents (disabled by default)
+
 v0.9.9
 * Fixed popup menu (inline js error).
 * Slight realignment of progress bars (were off by 1px).
