@@ -86,9 +86,9 @@ function rpcTransmission(args, method, tag, callback) {
 				localStorage.sessionId = xSid;
 				return rpcTransmission(args, method, tag, callback);
 			}
-			if (jqXHR.responseText == ""){		//If the server is unreachable, get null request
+			if (textStatus == "error"){		//If the server is unreachable, get null request
 				callback(JSON.parse(
-					'{"arguments":{"torrents":[{"addedDate":0,"doneDate":0,"downloadDir":"","eta":-1,"id":1,"leftUntilDone":0,"metadataPercentComplete":1,"name":"Unable to connect to '+localStorage.server+'.","rateDownload":0,"rateUpload":0,"recheckProgress":0,"sizeWhenDone":0,"status":0,"uploadedEver":0}]},"result":"fail","tag":1}'
+					'{"arguments":{"torrents":[{"addedDate":0,"doneDate":0,"downloadDir":"","eta":0,"id":0,"leftUntilDone":0,"metadataPercentComplete":0,"name":"Unable to connect to '+localStorage.server+'.","rateDownload":0,"rateUpload":0,"recheckProgress":0,"sizeWhenDone":0,"status":0,"uploadedEver":0}]},"result":"Unable to connect to server.","tag":1}'
 				));
 				return;
 			}
