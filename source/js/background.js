@@ -196,19 +196,17 @@ function dlTorrent(request) {
 	// send the torrent to transmission
 	rpcTransmission(args, 'torrent-add', '', function (response) {
 		// show a badge on the browser icon depending on the response from Transmission
-		switch(response.result) {
-			case 'success':
-				showBadge('add', [0, 255, 0, 255]);
-				showNotification("Torrent added successfully", response.arguments["torrent-added"].name);
-			break;
-			case 'duplicate torrent':
-				showBadge('dup', [0, 0, 255, 255]);
-				showNotification("Duplicate torrent", "");
-			break;
-			default:
-				showBadge('fail', [255, 0, 0, 255]);
-				showNotification("Adding torrent failed", "");
-				alert('Torrent download failed!\n\n' + response.result);
+		// show a badge on the browser icon depending on the response from Transmission
+		if (response.arguments["torrent-duplicate"]) {
+			showBadge('dup', [0, 0, 255, 255]);
+			showNotification("Duplicate torrent", "");
+		} else if (response.arguments["torrent-added"]) {
+			showBadge('add', [0, 255, 0, 255]);
+			showNotification("Torrent added successfully", response.arguments["torrent-added"].name);
+		} else {
+			showBadge('fail', [255, 0, 0, 255]);
+			showNotification("Adding torrent failed", "");
+			alert('Torrent download failed!\n\n' + response.result);
 		}
 	});
 }
