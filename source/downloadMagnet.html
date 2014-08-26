@@ -1,26 +1,24 @@
 <!DOCTYPE html>
 <html>
-<head>
-
-<title>Save Magnet</title>
-<link rel="stylesheet" type="text/css" href="css/downloadMagnet.css" />
-<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="js/downloadMagnet.js"></script>
-
-</head>
-
-<body>
-
-<ul id="container">
-	<li>
-		<label id="downloadLabel" for="downloadLocations">Save in folder:</label>
-		<select id="downloadLocations"></select>
+	<head>
+		<title>Save Magnet</title>
+		<link rel="stylesheet" type="text/css" href="css/downloadMagnet.css" />
+		<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="js/downloadMagnet.js"></script>
+		<meta name="google" content="notranslate">
+	</head>
+	<body>
+		<ul id="container">
+			<li>
+				<label id="downloadLabel" for="downloadLocations">Save in folder:</label>
+				<select id="downloadLocations">
+					<option value="">&lt; Default Directory &gt;</option>
+				</select>
+				<div class="clear"></div>
+			</li>
+		</ul>
+		<button id="save">Save</button>
+		<button id="cancel">Cancel</button>
 		<div class="clear"></div>
-	</li>
-</ul>
-
-<button id="save">Save</button>
-<button id="cancel">Cancel</button>
-<div class="clear"></div>
-</body>
+	</body>
 </html>

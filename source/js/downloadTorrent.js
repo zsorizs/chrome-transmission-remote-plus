@@ -78,36 +78,28 @@ function sortFiles(a, b) {
 
 // populate the download popup with the torrent information
 chrome.extension.sendMessage({ 'method': 'get-torrent-info', 'page': 'torrent' }, function(request) {
-	var select = document.getElementById('downloadLocations');
+	var select = $('#downloadLocations');
 	var option;
 	var table = document.getElementById('files');
 	var row;
 	var boxes;
 
-	var paused = document.getElementById('downloadPauseTorrent');
+	var paused = $('#downloadPauseTorrent');
 
 	var name = decodeString(request.torrent.info.name);
 
 	// add the name of the torrent
-	document.getElementById('torrentName').innerHTML = name;
+	$('#torrentName').innerHTML = name;
 
 	// add the list of download directories
 	if (request.dirs.length === 0) {
 		select.disabled = 'disabled';
-
-		// create the default directory download option
-		option = document.createElement('option');
-		option.text = '< Default Directory >';
-		option.value = '';
-
-		select.add(option, null);
 	} else {
 		for (var i = 0, dir; dir = request.dirs[i]; ++i) {
-			option = document.createElement('option');
-			option.text = decodeString(dir.label);
-			option.value = dir.dir;
-
-			select.add(option, null);
+			select.append($('<option>', {
+				text: decodeString(request.dirs[i].label) + " (" + request.dirs[i].dir + ")",
+				value: request.dirs[i].dir
+			}));
 		}
 	}
 
@@ -194,6 +186,7 @@ chrome.extension.sendMessage({ 'method': 'get-torrent-info', 'page': 'torrent' }
 		}
 	});
 
+	//events
 	$('#save').click( function (e) {
 		chrome.extension.sendMessage({
 				'data': request.data,

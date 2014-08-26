@@ -1,51 +1,48 @@
 <!DOCTYPE html>
 <html>
-<head>
-
-<title>Save Torrent</title>
-<link rel="stylesheet" type="text/css" href="css/downloadTorrent.css" />
-<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="js/downloadTorrent.js"></script>
-<meta name="google" value="notranslate">
-</head>
-
-<body>
-
-<ul id="container">
-	<li id="torrentName"></li>
-	<li>
-		<label id="downloadLabel" for="downloadLocations">Save in folder:</label>
-		<select id="downloadLocations"></select>
+	<head>
+		<title>Save Torrent</title>
+		<link rel="stylesheet" type="text/css" href="css/downloadTorrent.css" />
+		<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="js/downloadTorrent.js"></script>
+		<meta name="google" content="notranslate">
+	</head>
+	<body>
+		<ul id="container">
+			<li id="torrentName"></li>
+			<li>
+				<label id="downloadLabel" for="downloadLocations">Save in folder:</label>
+				<select id="downloadLocations">
+					<option value="">&lt; Default Directory &gt;</option>
+				</select>
+				<div class="clear"></div>
+			</li>
+			<li>
+				<label id="downloadPaused" for="downloadPauseTorrent">Pause torrent:</label>
+				<input id="downloadPauseTorrent" type="checkbox">
+				<div class="clear"></div>
+			</li>
+			<li id="filesContainer">
+				<table id="files">
+					<tr>
+						<th class="checkAll">
+							<input name="checkAll" id="checkAll" type="checkbox" checked>
+						</th>
+						<th class="name">
+							Name
+						</th>
+						<th class="size">
+							Size
+						</th>
+						<th class="priority">
+							Priority
+						</th>
+					</tr>
+				</table>
+			</li>
+		</ul>
+		<button id="save">Save</button>
+		<button id="cancel">Cancel</button>
 		<div class="clear"></div>
-	</li>
-	<li>
-		<label id="downloadPaused" for="downloadPauseTorrent">Pause torrent:</label>
-		<input id="downloadPauseTorrent" type="checkbox">
-		<div class="clear"></div>
-	</li>
-	<li id="filesContainer">
-		<table id="files">
-			<tr>
-				<th class="checkAll">
-					<input name="checkAll" id="checkAll" type="checkbox" checked="true">
-				</th>
-				<th class="name">
-					Name
-				</th>
-				<th class="size">
-					Size
-				</th>
-				<th class="priority">
-					Priority
-				</th>
-			</tr>
-		</table>
-	</li>
-</ul>
-
-<button id="save">Save</button>
-<button id="cancel">Cancel</button>
-<div class="clear"></div>
-
-</body>
+	</body>
 </html>
