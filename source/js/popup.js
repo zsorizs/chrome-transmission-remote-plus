@@ -3,7 +3,7 @@ var torrents = [];	// array of displayed torrents
 var refresh;		// variable that holds refreshPopup() timeout
 var port = chrome.extension.connect({ name: 'popup' });
 
-const TAG_BASELINE	= 1;
+const TAG_BASELINE		= 1;
 const TAG_UPDATE		= 2;
 const TAG_TURTLE_MODE	= 3;
 
@@ -13,7 +13,6 @@ Array.prototype.getTorrentById = function(id) {
 	for (var i = this.length - 1; i >= 0; i--) {
 		if (this[i].id === id) return i;
 	}
-
 	return -1;
 };
 
@@ -34,8 +33,9 @@ function formatBytes(bytes) {
 function formatSeconds(seconds) {
 	if (seconds < 1) return 'unknown time';
 
-	var units = [ { 'seconds': 86400, 'label': 'days' }, { 'seconds': 3600, 'label': 'hr' }, { 'seconds': 60, 'label': 'min' }, { 'seconds': 1, 'label': 'seconds' } ],
-		tmp, time;
+	var units = [ { 'seconds': 86400, 'label': 'days' }, { 'seconds': 3600, 'label': 'hr' }, { 'seconds': 60, 'label': 'min' }, { 'seconds': 1, 'label': 'seconds' } ];
+	var tmp;
+	var time;
 
 	// loop through units and display a max of two consecutive units
 	for (var i = 0, unit; unit = units[i]; ++i) {
@@ -57,11 +57,11 @@ function formatSeconds(seconds) {
 
 // update the global stats
 function updateStats(uTorrents) {
-	var stats = [0, 0, 0];
-	var totalDownload = 0;
-	var totalUpload = 0;
-	var list		= $('#list')[0];
-	var status		= $('#status')[0];
+	var stats			= [0, 0, 0];
+	var totalDownload	= 0;
+	var totalUpload		= 0;
+	var list			= $('#list')[0];
+	var status			= $('#status')[0];
 
 	// count how many of each status
 	for (var i = 0, torrent; torrent = torrents[i]; ++i) {
@@ -106,7 +106,6 @@ function setStatusVisibility() {
 }
 
 port.onMessage.addListener(function(msg) {
-	console.log(msg);
 	switch(msg.tag) {
 		case TAG_BASELINE:
 			var uTorrents = msg.args.torrents.sort(function(a, b) { return b.addedDate - a.addedDate; });
