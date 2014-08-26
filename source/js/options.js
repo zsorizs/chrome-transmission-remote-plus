@@ -21,11 +21,11 @@ function addDir(label, dir) {
 	var table = document.getElementById('customdirs');
 
 	// duplicate label
-	for (var i = 2, row; row = table.rows[i]; ++i) {
-		if (row.childNodes[0].childNodes[0].value === label) return;
+	for (var i = 1; i < table.rows.length-1; ++i) {
+		if (table.rows[i].childNodes[0].childNodes[0].value === label) return;
 	}
 
-	var rowElem = table.insertRow(-1),
+	var rowElem = table.insertRow(table.rows.length-1),
 		col1Elem = rowElem.insertCell(-1),
 		col2Elem = rowElem.insertCell(-1),
 		col3Elem = rowElem.insertCell(-1),
@@ -86,18 +86,18 @@ function save() {
 	port.postMessage({ notificationstorrentfinished: document.getElementById('notificationstorrentfinished').checked });
 	port.postMessage({ notificationsnewtorrent: document.getElementById('notificationsnewtorrent').checked });
 
+	//whether to handle the torrent click (i.e. download remotely) or leave to chrome to handle (download locally)
 	localStorage.clickAction = (document.getElementById('dlremote').checked) ? 'dlremote' : 'dllocal';
 
+	//whether or not to show the download popup
 	localStorage.dlPopup = document.getElementById('dlpopup').checked;
 
-	localStorage.dLocation = (document.getElementById('dldefault').checked) ? 'dldefault' : 'dlcustom';
-
 	// loop through the custom directories and save them
-	var table = document.getElementById('customdirs'), dirs = [];
-	for (var i = 2, row; row = table.rows[i]; ++i) {
-		dirs.push({ label: row.childNodes[0].childNodes[0].value, dir: row.childNodes[1].childNodes[0].value });
+	var table = document.getElementById('customdirs');
+	var dirs = [];
+	for (var i = 1; i < table.rows.length-1; ++i) {
+		dirs.push({ "label": table.rows[i].childNodes[0].childNodes[0].value, "dir": table.rows[i].childNodes[1].childNodes[0].value });
 	}
-
 	localStorage.dirs = JSON.stringify(dirs);
 
 	$("#saved").fadeIn(100);
@@ -159,11 +159,6 @@ $(function() {
 	// download
 	document.getElementById(localStorage.clickAction).checked = true;
 	document.getElementById('dlpopup').checked = (localStorage.dlPopup === 'true') ? true : false;
-
-	document.getElementById(localStorage.dLocation).checked = true;
-	if (localStorage.dLocation === 'dlcustom') {
-		document.getElementById('dlpopup').disabled = true;
-	}
 
 	// display the list of custom download directories
 	for (var i = 0, dir; dir = dirs[i]; ++i) {
