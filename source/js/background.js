@@ -111,11 +111,11 @@ function rpcTransmission(args, method, tag, callback) {
 	nothing
 =================================================================================*/
 function getTorrent(url) {
-	var dirs = (localStorage.dLocation === 'dlcustom') ? JSON.parse(localStorage.dirs) : [];
+	var dirs = (localStorage.dirs) ? JSON.parse(localStorage.dirs) : [];
 	// don't use base64 on magnet links
 	if (url.toLowerCase().indexOf('magnet:') > -1) {
 		// show download popup?
-		if (localStorage.dLocation === 'dldefault' && localStorage.dlPopup === 'false') {
+		if (localStorage.dlPopup === 'false') {
 			dlTorrent({ 'url': url });
 		} else {
 			torrentInfo['magnet'] = { 'dirs': dirs, 'url': url };
@@ -129,7 +129,7 @@ function getTorrent(url) {
 			});
 		}
 	} else {	//it's a .torrent
-		if (localStorage.dLocation === 'dldefault' && localStorage.dlPopup === 'false') {	//don't show the download popup
+		if (localStorage.dlPopup === 'false') {	//don't show the download popup
 			dlTorrent({ 'url': url });
 		} else {	//show the download popup
 			getFile(url, function(file) {
