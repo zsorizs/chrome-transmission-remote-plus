@@ -107,9 +107,8 @@ function Torrent() {
 		this.name = props.name || TORRENT_ERROR;
 		this.status = props.status || TORRENT_ERROR;
 
-		var	self = this
-		,	progress = 100 - (props.leftUntilDone / props.sizeWhenDone * 100)
-		;
+		var self = this;
+		var progress = 100 - (props.leftUntilDone / props.sizeWhenDone * 100);
 
 		oName = $('<div>' + props.name + '</div>').attr({
 				'class': 'torrent_name'

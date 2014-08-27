@@ -336,8 +336,12 @@ chrome.contextMenus.create({
 	}
 
 	// make sure users are up-to-date with their config
-	var VERCONFIG = 5;	//This value must be equal to that in options.js
-	if (typeof localStorage.verConfig === 'undefined' || localStorage.verConfig < VERCONFIG) chrome.tabs.create({ url: 'options.html' });
+	//                first install                                           upgraded extension                                          upgraded extension, new config version
+	if (localStorage.verConfig === "undefined" || chrome.app.getDetails().version !== localStorage.extensionVersion || chrome.app.getDetails().config_version !== localStorage.verConfig) {
+		chrome.tabs.create({ url: "options.html?newver=true" });
+	}
+	localStorage.extensionVersion = chrome.app.getDetails().version;
+	localStorage.verConfig = chrome.app.getDetails().config_version;
 
 	//This function runs when the extension is first loaded.
 	//If that's after tabs are already open, then we need to inject our script into them, or they won't pick up torrent/magnet link clicks.
