@@ -170,6 +170,9 @@ $(function() {
 			window.close();
 		}
 	}
+	localStorage.extensionVersion = chrome.app.getDetails().version;
+	localStorage.verConfig = chrome.app.getDetails().config_version;
+
 
 	var dirs = JSON.parse(localStorage.dirs);
 	var server = localStorage.server.match(/(https?):\/\/(.+):(\d+)\/?(.*)/);
