@@ -336,7 +336,8 @@ chrome.contextMenus.create({
 	}
 
 	// make sure users are up-to-date with their config
-	if (typeof localStorage.verConfig === 'undefined' || localStorage.verConfig < 5) chrome.tabs.create({ url: 'options.html' });
+	var VERCONFIG = 5;	//This value must be equal to that in options.js
+	if (typeof localStorage.verConfig === 'undefined' || localStorage.verConfig < VERCONFIG) chrome.tabs.create({ url: 'options.html' });
 
 	//This function runs when the extension is first loaded.
 	//If that's after tabs are already open, then we need to inject our script into them, or they won't pick up torrent/magnet link clicks.

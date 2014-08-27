@@ -164,7 +164,7 @@ function refreshPopup() {
 
 	port.postMessage({ 'args': '', 'method': 'session-get', 'tag': TAG_TURTLE_MODE });
 
-	refresh = setTimeout(refreshPopup, 3000);
+	refresh = setTimeout(refreshPopup, parseInt(localStorage.popuprefreshinterval));
 }
 
 $(function() {
