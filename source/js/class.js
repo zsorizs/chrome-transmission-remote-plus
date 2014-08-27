@@ -26,11 +26,8 @@ function Torrent() {
 	// send RPC for a torrent
 	this.sendRPC = function(method, ctrlDown) {
 		clearTimeout(refresh);
-
 		var deleteCmd = (method === 'torrent-remove' && ctrlDown) ? ', "delete-local-data": true' : '';
-
 		port.postMessage({ args: '"ids": [ ' + this.id + ' ]' + deleteCmd, method: method });
-
 		refresh = setTimeout(refreshPopup, method === 'torrent-stop' ? 500 : 0);
 	};
 
@@ -57,13 +54,11 @@ function Torrent() {
 	function adjustLabels(props, percentDone) {
 		switch(props.status) {
 			case TORRENT_WAIT_VERIFY:
-				oStats.text(formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone)
-							+ ' (' + percentDone.toFixed(2) + '%) - waiting to verify local data');
+				oStats.text(formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) + ' (' + percentDone.toFixed(2) + '%) - waiting to verify local data');
 				oSpeeds.text('');
 			break;
 			case TORRENT_VERIFING:
-				oStats.text(formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone)
-							+ ' (' + percentDone.toFixed(2) + '%) - verifying local data (' + (props.recheckProgress * 100).toFixed() + '%)');
+				oStats.text(formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) + ' (' + percentDone.toFixed(2) + '%) - verifying local data (' + (props.recheckProgress * 100).toFixed() + '%)');
 				oSpeeds.text('');
 			break;
 			case TORRENT_DOWNLOADING:
@@ -72,14 +67,12 @@ function Torrent() {
 					oSpeeds.text('');
 					oProgress.attr('class', 'torrent_progress magnetizing');
 				} else {
-					oStats.text(formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone)
-								+ ' (' + percentDone.toFixed(2) + '%) - ' + formatSeconds(props.eta) + ' remaining');
+					oStats.text(formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) + ' (' + percentDone.toFixed(2) + '%) - ' + formatSeconds(props.eta) + ' remaining');
 					oSpeeds.text('DL: ' + formatBytes(props.rateDownload) + '/s UL: ' + formatBytes(props.rateUpload) + '/s');
 				}
 			break;
 			case TORRENT_SEEDING:
-				oStats.text(formatBytes(props.sizeWhenDone) + ' - Seeding, uploaded ' + formatBytes(props.uploadedEver)
-					+ ' (Ratio ' + (props.uploadedEver / props.sizeWhenDone).toFixed(2) + ')');
+				oStats.text(formatBytes(props.sizeWhenDone) + ' - Seeding, uploaded ' + formatBytes(props.uploadedEver) + ' (Ratio ' + (props.uploadedEver / props.sizeWhenDone).toFixed(2) + ')');
 				oSpeeds.text('UL: ' + formatBytes(props.rateUpload) + '/s');
 				oProgressBar.attr('class', 'seeding');
 			break;
@@ -157,6 +150,8 @@ function Torrent() {
 				'title': 'Double-click to remove torrent\n\nHold down CTRL to also delete data'
 		}).dblclick(function(e) {
 			self.sendRPC('torrent-remove', e.ctrlKey);
+		}).mousedown(function(e) {	//prevent text being selected on double-click
+			e.preventDefault();
 		}).appendTo(oRoot);
 
 		adjustProgress(progress);

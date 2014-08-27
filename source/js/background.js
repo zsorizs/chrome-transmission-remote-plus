@@ -82,9 +82,10 @@ function rpcTransmission(args, method, tag, callback) {
 	).complete(
 		function(jqXHR, textStatus) {
 			var xSid = jqXHR.getResponseHeader('X-Transmission-Session-Id');
-			if(xSid) {
+			if(xSid) {	//X-Transmission-Session-Id should only be included if we didn't include it when we sent our request
 				localStorage.sessionId = xSid;
-				return rpcTransmission(args, method, tag, callback);
+				rpcTransmission(args, method, tag, callback);
+				return;
 			}
 			if (textStatus == "error"){		//If the server is unreachable, get null request
 				callback(JSON.parse(
@@ -93,7 +94,7 @@ function rpcTransmission(args, method, tag, callback) {
 				return;
 			}
 			if (callback) {
-				callback(JSON.parse(jqXHR.responseText));
+				callback(jqXHR.responseJSON);
 			}
 		}
 	);
@@ -336,4 +337,18 @@ chrome.contextMenus.create({
 
 	// make sure users are up-to-date with their config
 	if (typeof localStorage.verConfig === 'undefined' || localStorage.verConfig < 5) chrome.tabs.create({ url: 'options.html' });
+
+	//This function runs when the extension is first loaded.
+	//If that's after tabs are already open, then we need to inject our script into them, or they won't pick up torrent/magnet link clicks.
+	chrome.windows.getAll({populate:true}, function(windows) {
+		for (var i = 0; i < windows.length; i++) {
+			for (var j = 0; j < windows[i].tabs.length; j++) {
+				if (windows[i].tabs[j].url.substr(0,4) == "http") {
+					console.log(windows[i].tabs[j].id+"\t"+windows[i].tabs[j].url);
+					chrome.tabs.executeScript(windows[i].tabs[j].id, {file: "js/inject.js"});
+				}
+			}
+		}
+	});
+
 })();
