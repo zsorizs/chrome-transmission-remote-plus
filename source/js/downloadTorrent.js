@@ -190,7 +190,7 @@ chrome.extension.sendMessage({ 'method': 'get-torrent-info', 'page': 'torrent' }
 	$('#save').click( function (e) {
 		chrome.extension.sendMessage({
 				'data': request.data,
-				'dir': select.options[select.selectedIndex].value,
+				'dir': select.val(),
 				'paused': paused.checked,
 				'high': getPrioHighFields(),
 				'normal': getPrioMedFields(),

@@ -347,7 +347,6 @@ chrome.contextMenus.create({
 		for (var i = 0; i < windows.length; i++) {
 			for (var j = 0; j < windows[i].tabs.length; j++) {
 				if (windows[i].tabs[j].url.substr(0,4) == "http") {
-					console.log(windows[i].tabs[j].id+"\t"+windows[i].tabs[j].url);
 					chrome.tabs.executeScript(windows[i].tabs[j].id, {file: "js/inject.js"});
 				}
 			}
