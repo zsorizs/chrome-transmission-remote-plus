@@ -1,7 +1,9 @@
 Based on Remote Transmission Plus
 
 v0.9.9.6
-* Fix showing of directories in download popups.
+* Catch magnet/torrent links on existing tabs after an update / first install.
++ Add option to change popup refresh interval.
++ Fixed a bug in the Torrent window that prevented saving.
 
 v0.9.9.5
 * Fix showing of directories in download popups.
