@@ -1,5 +1,12 @@
 Based on Remote Transmission Plus
 
+Changelog
+Legend:
++ Added
+- Removed
+* Bugfix
+! Known issue
+
 v0.9.9.6
 * Catch magnet/torrent links on existing tabs after an update / first install.
 + Add option to change popup refresh interval.

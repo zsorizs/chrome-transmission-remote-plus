@@ -347,6 +347,8 @@ chrome.contextMenus.create({
 		for (var i = 0; i < windows.length; i++) {
 			for (var j = 0; j < windows[i].tabs.length; j++) {
 				if (windows[i].tabs[j].url.substr(0,4) == "http") {
+					//Chrome will throw an error here if the user has the chrome://extensions window open,
+					// despite the fact that we don't inject the script to that tab.
 					chrome.tabs.executeScript(windows[i].tabs[j].id, {file: "js/inject.js"});
 				}
 			}

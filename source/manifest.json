@@ -22,7 +22,6 @@
 	"name": "Remote Transmission ++",
 	"options_page": "options.html",
 	"permissions": [ "http://*/", "https://*/", "contextMenus", "notifications", "tabs" ],
-	"update_url": "http://clients2.google.com/service/update2/crx",
 	"version": "0.9.9.6",
 	"config_version": "5"
 }
