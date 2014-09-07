@@ -260,7 +260,7 @@ input[type="text"] {
 
 .torrent_button {
 	position: absolute;
-	top: 31px;
+	top: 32px;
 	width: 14px;
 	height: 12px;
 	background: url(../images/buttons.png) no-repeat;
