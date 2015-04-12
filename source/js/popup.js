@@ -108,6 +108,11 @@ function setStatusVisibility() {
 port.onMessage.addListener(function(msg) {
 	switch(msg.tag) {
 		case TAG_BASELINE:
+			// remove all previous torrents
+			for (var i = 0; torrent = torrents[i]; ++i) {
+				torrents.splice(torrent, 1)[0].removeElem();
+			}
+
 			var uTorrents = msg.args.torrents.sort(function(a, b) { return b.addedDate - a.addedDate; });
 
 			// add the torrent to the torrents array and set whether it's visible or not
