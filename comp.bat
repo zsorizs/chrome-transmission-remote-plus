@@ -29,4 +29,4 @@ rd dist /s /Q
 
 rem chrome --pack-extension=%CD%\source --pack-extension-key=%CD%\source.pem
 
-cat log.txt
+type log.txt

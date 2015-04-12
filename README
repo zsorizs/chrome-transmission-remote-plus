@@ -7,6 +7,10 @@ Legend:
 * Bugfix
 ! Known issue
 
+v0.9.9.7
+* Give the popup a minimum height so the buttons are always clickable (thanks jonathantribouharet)
+* Clear all previous torrents on error (thanks jonathantribouharet) hopefully stops torrents showing up multiple times.
+
 v0.9.9.6
 * Catch magnet/torrent links on existing tabs after an update / first install.
 + Add option to change popup refresh interval.
