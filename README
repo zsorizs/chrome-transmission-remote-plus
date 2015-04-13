@@ -7,7 +7,11 @@ Legend:
 * Bugfix
 ! Known issue
 
-v0.9.9.7
+2015-04-13 v0.9.9.8
+* Fixed filtering (presumably broken for some time due to RPC changes)
++ Added a filtering category 'Active' to filter out stopped/completed torrents. (Closes issue #10).
+
+2015-04-12 v0.9.9.7
 * Give the popup a minimum height so the buttons are always clickable (thanks jonathantribouharet)
 * Clear all previous torrents on error (thanks jonathantribouharet) hopefully stops torrents showing up multiple times.
 

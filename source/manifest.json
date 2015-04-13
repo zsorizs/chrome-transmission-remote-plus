@@ -22,6 +22,6 @@
 	"name": "Remote Transmission ++",
 	"options_page": "options.html",
 	"permissions": [ "http://*/", "https://*/", "contextMenus", "notifications", "tabs" ],
-	"version": "0.9.9.6",
+	"version": "0.9.9.8",
 	"config_version": "5"
 }
