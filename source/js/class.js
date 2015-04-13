@@ -2,13 +2,14 @@
 
 function Torrent() {
 
-	const	TORRENT_ERROR		= -1;
-	const	TORRENT_PAUSED		= 0;
-	const	TORRENT_WAIT_VERIFY	= 1;
-	const	TORRENT_VERIFING	= 2;
-	const	TORRENT_DOWNLOADING	= 4;
-	const	TORRENT_SEEDING		= 6;
-	//const	TORRENT_PAUSED		= 16;
+
+	const	TR_STATUS_STOPPED        = 0; /* Torrent is stopped */
+	const	TR_STATUS_CHECK_WAIT     = 1; /* Queued to check files */
+	const	TR_STATUS_CHECK          = 2; /* Checking files */
+	const	TR_STATUS_DOWNLOAD_WAIT  = 3; /* Queued to download */
+	const	TR_STATUS_DOWNLOAD       = 4; /* Downloading */
+	const	TR_STATUS_SEED_WAIT      = 5; /* Queued to seed */
+	const	TR_STATUS_SEED           = 6; /* Seeding */
 
 	var	oPauseBtn;
 	var	oResumeBtn;
@@ -21,7 +22,7 @@ function Torrent() {
 
 	this.id = 0;
 	this.name = '';
-	this.status = 0;
+	this.status = -1;
 
 	// send RPC for a torrent
 	this.sendRPC = function(method, ctrlDown) {
@@ -36,10 +37,12 @@ function Torrent() {
 		var filter = !localStorage.torrentFilter
 						? ''
 						: new RegExp(localStorage.torrentFilter.replace(/ /g, '[^A-z0-9]*'), 'i')
-		,	type = localStorage.torrentType || 0
+		,	type = localStorage.torrentType || -1
 		;
+		console.log(filter);
+		console.log(type);
 
-		if ((type == 0 || this.status == type) && this.name.search(filter) > -1) {
+		if ((type == -1 || this.status == type || type.indexOf(this.status) > -1) && this.name.search(filter) > -1) {
 			$('#list').append(oRoot);
 		} else {
 			$('#list_hidden').append(oRoot);
@@ -47,21 +50,21 @@ function Torrent() {
 	};
 
 	function adjustButtons(status) {
-		oPauseBtn.toggle(status === TORRENT_DOWNLOADING || status === TORRENT_SEEDING);
-		oResumeBtn.toggle(status === TORRENT_PAUSED || status === TORRENT_ERROR || status == TORRENT_PAUSED);
+		oPauseBtn.toggle(status === TR_STATUS_CHECK_WAIT || status === TR_STATUS_CHECK || status === TR_STATUS_DOWNLOAD_WAIT || status === TR_STATUS_DOWNLOAD || status === TR_STATUS_SEED_WAIT || status === TR_STATUS_SEED);
+		oResumeBtn.toggle(status === TR_STATUS_STOPPED || status === TR_STATUS_DOWNLOAD_WAIT);
 	}
 
 	function adjustLabels(props, percentDone) {
 		switch(props.status) {
-			case TORRENT_WAIT_VERIFY:
+			case TR_STATUS_CHECK_WAIT:
 				oStats.text(formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) + ' (' + percentDone.toFixed(2) + '%) - waiting to verify local data');
 				oSpeeds.text('');
 			break;
-			case TORRENT_VERIFING:
+			case TR_STATUS_CHECK:
 				oStats.text(formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) + ' (' + percentDone.toFixed(2) + '%) - verifying local data (' + (props.recheckProgress * 100).toFixed() + '%)');
 				oSpeeds.text('');
 			break;
-			case TORRENT_DOWNLOADING:
+			case TR_STATUS_DOWNLOAD:
 				if (props.metadataPercentComplete < 1) {
 					oStats.text('Magnetized transfer - retrieving metadata (' + (props.metadataPercentComplete * 100).toFixed() + '%)');
 					oSpeeds.text('');
@@ -71,12 +74,12 @@ function Torrent() {
 					oSpeeds.text('DL: ' + formatBytes(props.rateDownload) + '/s UL: ' + formatBytes(props.rateUpload) + '/s');
 				}
 			break;
-			case TORRENT_SEEDING:
+			case TR_STATUS_SEED:
 				oStats.text(formatBytes(props.sizeWhenDone) + ' - Seeding, uploaded ' + formatBytes(props.uploadedEver) + ' (Ratio ' + (props.uploadedEver / props.sizeWhenDone).toFixed(2) + ')');
 				oSpeeds.text('UL: ' + formatBytes(props.rateUpload) + '/s');
 				oProgressBar.attr('class', 'seeding');
 			break;
-			case TORRENT_PAUSED:
+			case TR_STATUS_STOPPED:
 				if (props.leftUntilDone) {
 					oStats.text(formatBytes(props.sizeWhenDone - props.leftUntilDone) + ' of ' + formatBytes(props.sizeWhenDone) + ' (' + percentDone.toFixed(2) + '%) - Paused');
 					oProgressBar.attr('class', 'paused');
@@ -103,9 +106,9 @@ function Torrent() {
 	// create the list element and update torrent properties
 	this.createElem = function(props) {
 
-		this.id = props.id || TORRENT_ERROR;
-		this.name = props.name || TORRENT_ERROR;
-		this.status = props.status || TORRENT_ERROR;
+		this.id = props.id;
+		this.name = props.name;
+		this.status = props.status;
 
 		var self = this;
 		var progress = 100 - (props.leftUntilDone / props.sizeWhenDone * 100);
@@ -163,7 +166,7 @@ function Torrent() {
 
 		var progress = 100 - (props.leftUntilDone / props.sizeWhenDone * 100);
 
-		this.status = props.status || TORRENT_ERROR;
+		this.status = props.status;
 
 		oName.attr('title', props.name + '\n\nDownloaded to: ' + props.downloadDir);
 		oProgress.attr('class', 'torrent_progress');

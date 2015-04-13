@@ -174,7 +174,7 @@ function refreshPopup() {
 
 $(function() {
 	// persistent torrent type dropdown and filter textbox
-	$('#filter_type').val(localStorage.torrentType || 0);
+	$('#filter_type').val(localStorage.torrentType || -1);
 
 	var filterValue = localStorage.torrentFilter || "";
 	$('#filter_input').val(filterValue);
