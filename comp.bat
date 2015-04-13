@@ -8,13 +8,13 @@ xcopy source dist\source /I /s
 FOR %%G IN (source\js\*.js) DO (
 	echo: >> log.txt
 	echo  ### processing  %%G >> log.txt
-	java -jar yuicompressor.jar --type js %%G -o dist\%%G -v --charset utf-8 2>>log.txt
+	java -jar yuicompressor-2.4.8.jar --type js %%G -o dist\%%G -v --charset utf-8 2>>log.txt
 )
 
 FOR %%G IN (source\css\*.css) DO (
 	echo: >> log.txt
 	echo ### processing %%G >> log.txt
-	java -jar yuicompressor.jar --type css %%G -o dist\%%G -v --charset utf-8 2>>log.txt
+	java -jar yuicompressor-2.4.8.jar --type css %%G -o dist\%%G -v --charset utf-8 2>>log.txt
 )
 
 echo: >> log.txt
