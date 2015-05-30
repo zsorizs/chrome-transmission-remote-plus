@@ -168,6 +168,24 @@ function getTorrent(url) {
 	nothing
 =================================================================================*/
 function dlTorrent(request) {
+	if (request.add_to_custom_locations) {
+		var dir = request.dir;
+		var label = request.new_label;
+		if (label == "") {
+			var i = dir.lastIndexOf("/");
+			if (i == -1) {
+				label = dir;
+			} else {
+				// use basename as label
+				label = dir.substring(i+1);
+			}
+		}
+
+		var dirs = (localStorage.dirs) ? JSON.parse(localStorage.dirs) : [];
+		dirs.push({ "label": label, "dir": dir });
+		localStorage.dirs = JSON.stringify(dirs);
+	}
+
 	// how are we going to send this torrent to transmission?
 	var args = (typeof request.data !== 'undefined') ? '"metainfo": "' + request.data + '"' : '"filename": "' + request.url + '"';
 	// where are we going to download it to?

@@ -35,6 +35,18 @@ select, button {
 	vertical-align: middle;
 }
 
+#new {
+	display: none;
+}
+
+#newLabelDirectoryRow {
+	display: flex;
+}
+
+#newDirectory {
+	flex-grow: 1;
+}
+
 #cancel {
 	float: right;
 	width: 85px;
