@@ -52,7 +52,10 @@ function encodeFile(file, callback) {
 	var reader = new FileReader();
 
 	reader.onload = function (e) {
-		callback(reader.result.replace('data:application/x-bittorrent;base64,', '').replace('data:base64,', '').replace('data:;base64,', ''));
+		// assume base64 and just split to get data
+		// data:[<MIME-type>][;charset=<encoding>][;base64],<data>
+		var parts = reader.result.split(",", 2);
+		callback(parts[1]);
 	};
 
 	reader.readAsDataURL(file);
