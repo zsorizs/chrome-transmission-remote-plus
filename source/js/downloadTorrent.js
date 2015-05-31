@@ -251,7 +251,6 @@ $(function() {
 		newElm.toggle(e.target.selectedIndex == 1);
 	});
 
-	port.postMessage({ 'args': '', 'method': 'session-get', 'tag': TAG_DOWNLOAD_DIR });
 	port.onMessage.addListener(function(msg) {
 		switch(msg.tag) {
 			case TAG_DOWNLOAD_DIR:
@@ -264,4 +263,5 @@ $(function() {
 			break;
 		}
 	});
+	port.postMessage({ 'args': '', 'method': 'session-get', 'tag': TAG_DOWNLOAD_DIR });
 });
