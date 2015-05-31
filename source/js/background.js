@@ -314,6 +314,19 @@ chrome.extension.onConnect.addListener(function(port) {
 				if (msg.notifications) notificationRefresh();
 			});
 		break;
+		case 'downloadMagnet':
+		case 'downloadTorrent':
+			port.onMessage.addListener(function(msg) {
+				switch(msg.method) {
+					case 'session-get':
+						rpcTransmission(msg.args, msg.method, msg.tag, function (response) {
+							port.postMessage({ 'args': response.arguments, 'tag': response.tag });
+						});
+					break;
+				}
+			});
+
+                break;
 	}
 });
 

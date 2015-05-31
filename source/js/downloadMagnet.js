@@ -1,4 +1,6 @@
 var selectNewDirectoryIndex = 1;
+const TAG_DOWNLOAD_DIR = 1;
+var port = chrome.extension.connect({ name: 'downloadMagnet' });
 
 function decodeString(s) {
 	var r;
@@ -65,5 +67,19 @@ $(function() {
 			newElm.hide();
 		}
 		newElm.toggle(e.target.selectedIndex == 1);
+	});
+
+	port.postMessage({ 'args': '', 'method': 'session-get', 'tag': TAG_DOWNLOAD_DIR });
+	port.onMessage.addListener(function(msg) {
+		switch(msg.tag) {
+			case TAG_DOWNLOAD_DIR:
+				var download_dir = msg.args["download-dir"];
+				// new dir so be helpful and add a slash
+				if (!download_dir.endsWith("/")) {
+					download_dir += "/";
+				}
+				newDirectory.val(download_dir);
+			break;
+		}
 	});
 });
