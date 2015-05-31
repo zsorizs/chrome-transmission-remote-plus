@@ -55,15 +55,15 @@ chrome.extension.sendMessage({ 'method': 'get-torrent-info', 'page': 'magnet' },
 });
 
 $(function() {
-  var newElm = $("#new");
-  var newDirectory = $("#newDirectory");
-  $("#downloadLocations").on("change", function(e) {
-	  if (e.target.selectedIndex == selectNewDirectoryIndex) {
-		  newElm.show();
-		  newDirectory.focus();
-	  } else {
-		  newElm.hide();
-	  }
-	  newElm.toggle(e.target.selectedIndex == 1);
-  });
+	var newElm = $("#new");
+	var newDirectory = $("#newDirectory");
+	$("#downloadLocations").on("change", function(e) {
+		if (e.target.selectedIndex == selectNewDirectoryIndex) {
+			newElm.show();
+			newDirectory.focus();
+		} else {
+			newElm.hide();
+		}
+		newElm.toggle(e.target.selectedIndex == 1);
+	});
 });
