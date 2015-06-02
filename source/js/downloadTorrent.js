@@ -1,6 +1,6 @@
 var selectNewDirectoryIndex = 1;
 const TAG_DOWNLOAD_DIR = 1;
-var port = chrome.extension.connect({ name: 'downloadMagnet' });
+var port = chrome.extension.connect({ name: 'downloadTorrent' });
 
 // credit to: http://web.elctech.com/2009/01/06/convert-filesize-bytes-to-readable-string-in-javascript/
 // modified to allow for 0 bytes and removed extraneous Math.floor
