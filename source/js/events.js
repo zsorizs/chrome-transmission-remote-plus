@@ -4,7 +4,8 @@ $(function () {
 
 	// change the delete button to indicate if it deletes data or not
 	function changeDeleteButton(event, type) {
-		if (event.which === 17) {
+		const ALT_KEY = 18;
+		if (event.which === ALT_KEY) {
 			$('[name="torrent_remove"]').attr('class', 'torrent_button ' + type);
 		}
 	}
