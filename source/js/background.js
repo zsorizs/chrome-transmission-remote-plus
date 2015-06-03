@@ -124,7 +124,7 @@ function getTorrent(url) {
 				'url': 'downloadMagnet.html',
 				'type': 'popup',
 				'width': 852,
-				'height': 160,
+				'height': 190,
 				'left': screen.width/2 - 852/2,
 				'top': screen.height/2 - 160/2
 			});
@@ -142,7 +142,7 @@ function getTorrent(url) {
 								'url': 'downloadTorrent.html',
 								'type': 'popup',
 								'width': 850,
-								'height': 600,
+								'height': 610,
 								'left': (screen.width/2) - 425,
 								'top': (screen.height/2) - 300,
 							});
