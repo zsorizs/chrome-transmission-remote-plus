@@ -124,7 +124,7 @@ function getTorrent(url) {
 				'url': 'downloadMagnet.html',
 				'type': 'popup',
 				'width': 852,
-				'height': 160,
+				'height': 190,
 				'left': screen.width/2 - 852/2,
 				'top': screen.height/2 - 160/2
 			});
@@ -142,7 +142,7 @@ function getTorrent(url) {
 								'url': 'downloadTorrent.html',
 								'type': 'popup',
 								'width': 850,
-								'height': 600,
+								'height': 610,
 								'left': (screen.width/2) - 425,
 								'top': (screen.height/2) - 300,
 							});
@@ -168,6 +168,24 @@ function getTorrent(url) {
 	nothing
 =================================================================================*/
 function dlTorrent(request) {
+	if (request.add_to_custom_locations) {
+		var dir = request.dir;
+		var label = request.new_label;
+		if (label == "") {
+			var i = dir.lastIndexOf("/");
+			if (i == -1) {
+				label = dir;
+			} else {
+				// use basename as label
+				label = dir.substring(i+1);
+			}
+		}
+
+		var dirs = (localStorage.dirs) ? JSON.parse(localStorage.dirs) : [];
+		dirs.push({ "label": label, "dir": dir });
+		localStorage.dirs = JSON.stringify(dirs);
+	}
+
 	// how are we going to send this torrent to transmission?
 	var args = (typeof request.data !== 'undefined') ? '"metainfo": "' + request.data + '"' : '"filename": "' + request.url + '"';
 	// where are we going to download it to?
@@ -296,6 +314,19 @@ chrome.extension.onConnect.addListener(function(port) {
 				if (msg.notifications) notificationRefresh();
 			});
 		break;
+		case 'downloadMagnet':
+		case 'downloadTorrent':
+			port.onMessage.addListener(function(msg) {
+				switch(msg.method) {
+					case 'session-get':
+						rpcTransmission(msg.args, msg.method, msg.tag, function (response) {
+							port.postMessage({ 'args': response.arguments, 'tag': response.tag });
+						});
+					break;
+				}
+			});
+
+                break;
 	}
 });
 

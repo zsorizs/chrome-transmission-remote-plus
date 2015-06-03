@@ -49,6 +49,18 @@ select, button {
 	background-color: #fff;
 }
 
+#new {
+	display: none;
+}
+
+#newLabelDirectoryRow {
+	display: flex;
+}
+
+#newDirectory {
+	flex-grow: 1;
+}
+
 #files {
 	table-layout: fixed;
 	width: 100%;

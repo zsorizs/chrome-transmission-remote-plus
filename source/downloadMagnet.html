@@ -13,8 +13,16 @@
 				<label id="downloadLabel" for="downloadLocations">Save in folder:</label>
 				<select id="downloadLocations">
 					<option value="">&lt; Default Directory &gt;</option>
+					<option value="">&lt; New Directory... &gt;</option>
 				</select>
 				<div class="clear"></div>
+			</li>
+			<li id="new">
+				<div id="newLabelDirectoryRow">
+					<input type="text" id="newDirectory" placeholder="Directory"></input>
+					<input type="text" id="newLabel" placeholder="Optional label"></input>
+					<input type="checkbox" id="addToCustomLocations"></input> Add to custom locations
+				</div>
 			</li>
 		</ul>
 		<button id="save">Save</button>

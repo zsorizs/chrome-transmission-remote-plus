@@ -1,3 +1,6 @@
+var selectNewDirectoryIndex = 1;
+const TAG_DOWNLOAD_DIR = 1;
+var port = chrome.extension.connect({ name: 'downloadTorrent' });
 
 // credit to: http://web.elctech.com/2009/01/06/convert-filesize-bytes-to-readable-string-in-javascript/
 // modified to allow for 0 bytes and removed extraneous Math.floor
@@ -79,6 +82,9 @@ function sortFiles(a, b) {
 // populate the download popup with the torrent information
 chrome.extension.sendMessage({ 'method': 'get-torrent-info', 'page': 'torrent' }, function(request) {
 	var select = $('#downloadLocations');
+	var newLabel = $("#newLabel");
+	var newDirectory = $("#newDirectory");
+	var addToCustomLocations = $("#addToCustomLocations");
 	var option;
 	var table = document.getElementById('files');
 	var row;
@@ -188,15 +194,24 @@ chrome.extension.sendMessage({ 'method': 'get-torrent-info', 'page': 'torrent' }
 
 	//events
 	$('#save').click( function (e) {
-		chrome.extension.sendMessage({
-				'data': request.data,
-				'dir': select.val(),
-				'paused': paused.checked,
-				'high': getPrioHighFields(),
-				'normal': getPrioMedFields(),
-				'low': getPrioLowFields(),
-				'blacklist': getNotSelectedFilesIds() // "files-wanted" not work for some reason
-		});
+		message = {
+			'data': request.data,
+			'paused': paused.checked,
+			'high': getPrioHighFields(),
+			'normal': getPrioMedFields(),
+			'low': getPrioLowFields(),
+			'blacklist': getNotSelectedFilesIds() // "files-wanted" not work for some reason
+		};
+		if (select.prop("selectedIndex") == selectNewDirectoryIndex) {
+			message.dir = newDirectory.val();
+			if (addToCustomLocations.prop('checked')) {
+				message.new_label = newLabel.val();
+				message.add_to_custom_locations = true;
+			}
+		} else {
+			message.dir = select.val();
+		}
+		chrome.extension.sendMessage(message);
 		window.close();
 	});
 
@@ -222,3 +237,31 @@ function decodeBytes(bytes, encoding) {
 		chars[i]= enc.charAt(bytes.charCodeAt(i));
 	return chars.join('');
 }
+
+$(function() {
+	var newElm = $("#new");
+	var newDirectory = $("#newDirectory");
+	$("#downloadLocations").on("change", function(e) {
+		if (e.target.selectedIndex == selectNewDirectoryIndex) {
+			newElm.show();
+			newDirectory.focus();
+		} else {
+			newElm.hide();
+		}
+		newElm.toggle(e.target.selectedIndex == 1);
+	});
+
+	port.onMessage.addListener(function(msg) {
+		switch(msg.tag) {
+			case TAG_DOWNLOAD_DIR:
+				var download_dir = msg.args["download-dir"];
+				// new dir so be helpful and add a slash
+				if (!download_dir.endsWith("/")) {
+					download_dir += "/";
+				}
+				newDirectory.val(download_dir);
+			break;
+		}
+	});
+	port.postMessage({ 'args': '', 'method': 'session-get', 'tag': TAG_DOWNLOAD_DIR });
+});
