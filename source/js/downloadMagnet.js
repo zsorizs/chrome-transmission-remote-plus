@@ -19,7 +19,7 @@ chrome.extension.sendMessage({ 'method': 'get-torrent-info', 'page': 'magnet' },
 	} else {
 		for (var i = 0; i < request.dirs.length; i++) {
 			select.append($('<option>', {
-				text: decodeString(request.dirs[i].label) + " (" + request.dirs[i].dir + ")",
+				text: request.dirs[i].label + " (" + request.dirs[i].dir + ")",
 				value: request.dirs[i].dir
 			}));
 		}
