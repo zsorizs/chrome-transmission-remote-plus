@@ -100,6 +100,8 @@ function save() {
 	}
 	localStorage.dirs = JSON.stringify(dirs);
 
+	localStorage.version = chrome.runtime.getManifest().version;
+
 	$("#saved").fadeIn(100);
 	$("#saved").fadeOut(1000);
 }
@@ -108,7 +110,6 @@ $(function() {
 
 	var VERCONFIG = 5;	//This value must be updated in background.js too
 	var defaults = {
-		"verConfig"						: VERCONFIG,
 		"server"						: "http://localhost:9091/transmission",
 		"rpcPath"						: "rpc",
 		"webPath"						: "web",
@@ -122,7 +123,7 @@ $(function() {
 		"dlPopup"						: true,
 		"dirs"							: "[]",
 		"sessionId"						: "",
-		"torrentType"					: 0,
+		"torrentType"					: -1,
 		"torrentFilter"					: ""
 	}
 
@@ -166,13 +167,7 @@ $(function() {
 				localStorage[i] = defaults[i];
 			}
 		}
-		if (QueryString.newver) {	//if the window is being loaded automatically by the extension, then close it so the user doesn't have to worry about it
-			window.close();
-		}
 	}
-	localStorage.extensionVersion = chrome.app.getDetails().version;
-	localStorage.verConfig = chrome.app.getDetails().config_version;
-
 
 	var dirs = JSON.parse(localStorage.dirs);
 	var server = localStorage.server.match(/(https?):\/\/(.+):(\d+)\/?(.*)/);

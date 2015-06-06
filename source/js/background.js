@@ -367,8 +367,8 @@ chrome.contextMenus.create({
 	}
 
 	// make sure users are up-to-date with their config
-	//                first install                                           upgraded extension                                          upgraded extension, new config version
-	if (localStorage.verConfig === "undefined" || chrome.app.getDetails().version !== localStorage.extensionVersion || chrome.app.getDetails().config_version !== localStorage.verConfig) {
+	//                first install                                           upgraded extension major version
+	if (typeof(localStorage.version) == "undefined" || chrome.runtime.getManifest().version.split(".")[0] !== localStorage.version.split(".")[0] ) {
 		chrome.tabs.create({ url: "options.html?newver=true" });
 	}
 
