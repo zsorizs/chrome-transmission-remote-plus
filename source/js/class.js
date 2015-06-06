@@ -25,9 +25,9 @@ function Torrent() {
 	this.status = -1;
 
 	// send RPC for a torrent
-	this.sendRPC = function(method, ctrlDown) {
+	this.sendRPC = function(method, altDown) {
 		clearTimeout(refresh);
-		var deleteCmd = (method === 'torrent-remove' && ctrlDown) ? ', "delete-local-data": true' : '';
+		var deleteCmd = (method === 'torrent-remove' && altDown) ? ', "delete-local-data": true' : '';
 		port.postMessage({ args: '"ids": [ ' + this.id + ' ]' + deleteCmd, method: method });
 		refresh = setTimeout(refreshPopup, method === 'torrent-stop' ? 500 : 0);
 	};
@@ -149,9 +149,9 @@ function Torrent() {
 		oRemoveBtn = $('<div></div>').attr({
 				'name' : 'torrent_remove',
 				'class': 'torrent_button remove',
-				'title': 'Double-click to remove torrent\n\nHold down CTRL to also delete data'
+				'title': 'Double-click to remove torrent\n\nHold down ALT to also delete data'
 		}).dblclick(function(e) {
-			self.sendRPC('torrent-remove', e.ctrlKey);
+			self.sendRPC('torrent-remove', e.altKey);
 		}).mousedown(function(e) {	//prevent text being selected on double-click
 			e.preventDefault();
 		}).appendTo(oRoot);
