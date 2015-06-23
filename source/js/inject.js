@@ -1,10 +1,34 @@
+// array of regular expressions that dictate what is a valid torrent download url
+var TORRENT_LINKS = [
+	/^magnet:/i,
+	/\.torrent$/i,
+	/torrents\.php\?action=download/i,
+	/\?.*info_hash=/i,
+	/bt-chat\.com.*download/i,
+	/torrentreactor\.net.*download/i,
+	/vertor\.com.*download/i,
+	/seedpeer\.com.*download/i,
+	/torrentzap\.com.*download/i,
+	/limetorrents\.com.*download/i,
+	/h33t\.com.*download/i,
+	/ahashare\.com.*download/i,
+	/1337x\.org.*download/i,
+	/bitenova\.nl.*download/i,
+	/bibliotik\.org.*download/i,
+	/demonoid\.me.*download\//i,
+	/alivetorrents\.com\/dl\//i,
+	/newtorrents\.info\/down\.php/i,
+	/mininova\.org\/get/i,
+	/kickasstorrents\.com\/torrents/i
+];
+
 // open up a session with the background page
 var port = chrome.extension.connect({ name: 'inject' });
 
 /*=================================================================================
  clickTorrent(event e)
 
- send the torrent link that was clicked to the background page
+ // checks the link to see if it's a torrent download link, and sends it to be downloaded if so
 
  parameters
 	e: event variable sent by the event that was triggered
@@ -13,32 +37,21 @@ var port = chrome.extension.connect({ name: 'inject' });
 	nothing
 =================================================================================*/
 function clickTorrent(e) {
-	// begin download of torrent
-	port.postMessage({ 'url': e.currentTarget.href, 'method': 'torrent-add' });
+	if (e.target.tagName == "A") {
+		for (var i = 0; i < TORRENT_LINKS.length; i++) {
+			if (TORRENT_LINKS[i].test(e.target.getAttribute("href"))) {
+				// begin download of torrent
+				port.postMessage({ 'url': e.target.getAttribute("href"), 'method': 'torrent-add' });
 
-	// stop any further events and the default action of downloading locally
-	e.preventDefault();
-	e.stopPropagation();
+				// stop any further events and the default action of downloading locally
+				e.preventDefault();
+				e.stopPropagation();
+				return;
+			}
+		}
+	}
 }
 
-// torrent link has been verified as being valid, add click event to it
-port.onMessage.addListener(function(msg) {
-	switch (msg.method) {
-		case 'checkLink':
-			document.links[msg.num].addEventListener('click', clickTorrent, true);
-			break;
-		case 'checkClick':
-			var links = document.links;
-			// send each link to the background page for torrent validation
-			for (var i = 0, link; link = links[i]; ++i) {
-				port.postMessage({ 'url': link.href, 'num': i, 'method': 'checkLink' });
-			}
-			break;
-	}
-});
-
-// checks each link on the page to see if it's a torrent download link
 (function() {
-	// check to see if we should be hijacking torrent links
-	port.postMessage({ 'method': 'checkClick' });
+	document.body.addEventListener("click", clickTorrent);
 })();

@@ -114,7 +114,7 @@ function rpcTransmission(args, method, tag, callback) {
 function getTorrent(url) {
 	var dirs = (localStorage.dirs) ? JSON.parse(localStorage.dirs) : [];
 	// don't use base64 on magnet links
-	if (url.toLowerCase().indexOf('magnet:') > -1) {
+	if (url.toLowerCase().indexOf('magnet:') == 0) {
 		// show download popup?
 		if (localStorage.dlPopup === 'false') {
 			dlTorrent({ 'url': url });
@@ -286,21 +286,8 @@ chrome.extension.onConnect.addListener(function(port) {
 		case 'inject':
 			port.onMessage.addListener(function(msg) {
 				switch(msg.method) {
-					case 'checkLink':
-						for (var i = 0, torrentLink; torrentLink = TORRENT_LINKS[i]; ++i) {
-							if (torrentLink.test(msg.url)) {
-								port.postMessage({ 'url': msg.url, 'num': msg.num, 'method': 'checkLink' });
-								break;
-							}
-						}
-					break;
 					case 'torrent-add':
 						getTorrent(msg.url);
-					break;
-					case 'checkClick':
-						if (localStorage.clickAction === 'dlremote') {
-							port.postMessage({ 'method': 'checkClick' });
-						}
 					break;
 				}
 			});
