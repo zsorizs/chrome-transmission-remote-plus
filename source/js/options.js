@@ -58,39 +58,42 @@ function addDir(label, dir) {
 	removeButton.addEventListener('click', function() { table.tBodies[0].removeChild(rowElem); }, false);
 
 	// clear the add inputs
-	document.getElementById('customlabel').value = '';
-	document.getElementById('customdir').value = '';
+	document.getElementById("customlabel").value = "";
+	document.getElementById("customdir").value = "";
 }
 
 function save() {
-	localStorage.server = document.getElementById('protocol').value + '://' +
-		document.getElementById('ip').value + ':' +
-		document.getElementById('port').value;
+	localStorage.server = $('#protocol').val() + '://' +
+		$('#ip').val() + ':' +
+		$('#port').val();
 
-	if (document.getElementById('path').value !== '') {
-		localStorage.server += '/' + document.getElementById('path').value;
+	if ($('#path').val() !== '') {
+		localStorage.server += '/' + $('#path').val();
 	}
 
-	localStorage.rpcPath = (document.getElementById('rpcPath').value !== '') ? '/' + document.getElementById('rpcPath').value : '';
-	localStorage.webPath = (document.getElementById('webPath').value !== '') ? '/' + document.getElementById('webPath').value + '/': '';
+	localStorage.rpcPath = ($('#rpcPath').val() !== '') ? '/' + $('#rpcPath').val() : '';
+	localStorage.webPath = ($('#webPath').val() !== '') ? '/' + $('#webPath').val() + '/': '';
 
-	localStorage.user = document.getElementById('user').value;
-	localStorage.pass = document.getElementById('pass').value;
+	localStorage.user = $('#user').val();
+	localStorage.pass = $('#pass').val();
 
-	localStorage.notificationstorrentfinished = document.getElementById('notificationstorrentfinished').checked;
-	localStorage.notificationsnewtorrent = document.getElementById('notificationsnewtorrent').checked;
+	localStorage.notificationstorrentfinished = $('#notificationstorrentfinished').prop("checked");
+	localStorage.notificationsnewtorrent = $('#notificationsnewtorrent').prop("checked");
 
-	localStorage.browserbadgetimeout = document.getElementById('browserbadgetimeout').value;
+	localStorage.browserbadgetimeout = $('#browserbadgetimeout').val();
+	localStorage.popuprefreshinterval = $('#popuprefreshinterval').val();
 
 	// send message to background page to en/disable notifications
-	port.postMessage({ notificationstorrentfinished: document.getElementById('notificationstorrentfinished').checked });
-	port.postMessage({ notificationsnewtorrent: document.getElementById('notificationsnewtorrent').checked });
+	port.postMessage({ notificationstorrentfinished: $('#notificationstorrentfinished').checked });
+	port.postMessage({ notificationsnewtorrent: $('#notificationsnewtorrent').checked });
 
+	localStorage.start_paused = $('#start_paused').checked;
+	
 	//whether to handle the torrent click (i.e. download remotely) or leave to chrome to handle (download locally)
-	localStorage.clickAction = (document.getElementById('dlremote').checked) ? 'dlremote' : 'dllocal';
+	localStorage.clickAction = ($('#dlremote').checked) ? 'dlremote' : 'dllocal';
 
 	//whether or not to show the download popup
-	localStorage.dlPopup = document.getElementById('dlpopup').checked;
+	localStorage.dlPopup = $('#dlpopup').checked;
 
 	// loop through the custom directories and save them
 	var table = document.getElementById('customdirs');
@@ -108,7 +111,7 @@ function save() {
 
 $(function() {
 
-	var VERCONFIG = 5;	//This value must be updated in background.js too
+	var VERCONFIG = 6;	//This value must be updated in background.js too
 	var defaults = {
 		"server"						: "http://localhost:9091/transmission",
 		"rpcPath"						: "rpc",
@@ -119,6 +122,7 @@ $(function() {
 		"notificationsnewtorrent"		: false,
 		"browserbadgetimeout"			: 1000,
 		"popuprefreshinterval"			: 3000,
+		"start_paused"					: false,
 		"clickAction"					: "dlremote",
 		"dlPopup"						: true,
 		"dirs"							: "[]",
@@ -170,33 +174,36 @@ $(function() {
 	}
 
 	var dirs = JSON.parse(localStorage.dirs);
-	var server = localStorage.server.match(/(https?):\/\/(.+):(\d+)\/?(.*)/);
+	var server = localStorage.server.match(/(.*?):\/\/(.+):(\d+)\/(.*)/);
 
 	// server
-	document.getElementById('protocol').value = server[1];
-	document.getElementById('ip').value = server[2];
-	document.getElementById('port').value = server[3];
-	document.getElementById('path').value = server[4];
+	$('#protocol').val(server[1]);
+	$('#ip').val(server[2]);
+	$('#port').val(server[3]);
+	$('#path').val(server[4]);
 
-	document.getElementById('rpcPath').value = localStorage.rpcPath.replace(/\//g, '');
-	document.getElementById('webPath').value = localStorage.webPath.replace(/\//g, '');
+	$('#rpcPath').val(localStorage.rpcPath.replace(/\//g, ''));
+	$('#webPath').val(localStorage.webPath.replace(/\//g, ''));
 
-	document.getElementById('user').value = localStorage.user;
-	document.getElementById('pass').value = localStorage.pass;
+	$('#user').val(localStorage.user);
+	$('#pass').val(localStorage.pass);
 
 	// notifications
-	document.getElementById('notificationstorrentfinished').checked = (localStorage.notificationstorrentfinished === 'true');
-	document.getElementById('notificationsnewtorrent').checked = (localStorage.notificationsnewtorrent === 'true');
+	$('#notificationstorrentfinished').prop("checked", (localStorage.notificationstorrentfinished === 'true'));
+	$('#notificationsnewtorrent').prop("checked", localStorage.notificationsnewtorrent === 'true');
 
 	//badge timeout
-	document.getElementById('browserbadgetimeout').value = localStorage.browserbadgetimeout;
+	$('#browserbadgetimeout').val(localStorage.browserbadgetimeout);
 
 	//popup refresh interval
-	document.getElementById('popuprefreshinterval').value = localStorage.popuprefreshinterval;
+	$('#popuprefreshinterval').val(localStorage.popuprefreshinterval);
+
+	//Start paused?
+	$('#start_paused').val(localStorage.start_paused);
 
 	// download
 	document.getElementById(localStorage.clickAction).checked = true;
-	document.getElementById('dlpopup').checked = (localStorage.dlPopup === 'true');
+	$('#dlpopup').checked = (localStorage.dlPopup === 'true');
 
 	// display the list of custom download directories
 	for (var i = 0, dir; dir = dirs[i]; ++i) {
@@ -210,12 +217,12 @@ $(function() {
 
 $(function() {
 	$('#dldefault').bind("click", function() {
-		document.getElementById('dlpopup').disabled = false;
+		$('#dlpopup').disabled = false;
 	});
 	$('#dlcustom').bind("click", function() {
-		document.getElementById('dlpopup').disabled = true;
+		$('#dlpopup').disabled = true;
 	});
 	$('#adddir').bind("click", function() {
-		addDir(document.getElementById('customlabel').value, document.getElementById('customdir').value);
+		addDir($('#customlabel').val(), $('#customdir').val());
 	});
 });

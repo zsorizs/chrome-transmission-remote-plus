@@ -113,12 +113,12 @@ function rpcTransmission(args, method, tag, callback) {
 =================================================================================*/
 function getTorrent(url) {
 	var dirs = (localStorage.dirs) ? JSON.parse(localStorage.dirs) : [];
-	// don't use base64 on magnet links
-	if (url.toLowerCase().indexOf('magnet:') == 0) {
-		// show download popup?
-		if (localStorage.dlPopup === 'false') {
-			dlTorrent({ 'url': url });
-		} else {
+	// show download popup?
+	if (localStorage.dlPopup === 'false') {
+		dlTorrent({ 'url': url, 'paused': localStorage.start_paused });
+	} else {
+		// don't use base64 on magnet links
+		if (url.toLowerCase().indexOf('magnet:') == 0) {	//it's a magnet
 			torrentInfo['magnet'] = { 'dirs': dirs, 'url': url };
 			chrome.windows.create({
 				'url': 'downloadMagnet.html',
@@ -128,11 +128,7 @@ function getTorrent(url) {
 				'left': screen.width/2 - 852/2,
 				'top': screen.height/2 - 160/2
 			});
-		}
-	} else {	//it's a .torrent
-		if (localStorage.dlPopup === 'false') {	//don't show the download popup
-			dlTorrent({ 'url': url });
-		} else {	//show the download popup
+		} else {	//it's a .torrent
 			getFile(url, function(file) {
 				parseTorrent(file, function(torrent) {
 					if (torrent !== null) {
@@ -152,7 +148,7 @@ function getTorrent(url) {
 					}
 				});
 			});
-		};
+		}
 	}
 }
 
@@ -194,7 +190,7 @@ function dlTorrent(request) {
 	}
 	
 	if (request.paused) {
-		args += ', "paused": "true"';
+		args += ', "paused": true';
 	}
 	if(request.high && request.high.length) {
 		args += ', "priority-high": [' + request.high.join(',') + ']';
