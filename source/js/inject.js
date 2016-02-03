@@ -37,21 +37,21 @@ var port = chrome.extension.connect({ name: 'inject' });
 	nothing
 =================================================================================*/
 function clickTorrent(e) {
-	if (e.target.tagName == "A") {
-		for (var i = 0; i < TORRENT_LINKS.length; i++) {
-			if (TORRENT_LINKS[i].test(e.target.getAttribute("href"))) {
-				// begin download of torrent
-				port.postMessage({ 'url': e.target.getAttribute("href"), 'method': 'torrent-add' });
+	var url = $(this).attr("href");
+	for (var i = 0; i < TORRENT_LINKS.length; i++) {
+		if (TORRENT_LINKS[i].test(url)) {
+			// begin download of torrent
+			port.postMessage({ 'url': url, 'method': 'torrent-add' });
 
-				// stop any further events and the default action of downloading locally
-				e.preventDefault();
-				e.stopPropagation();
-				return;
-			}
+			// stop any further events and the default action of downloading locally
+			e.preventDefault();
+			e.stopPropagation();
+			return;
 		}
 	}
 }
 
-(function() {
-	document.body.addEventListener("click", clickTorrent);
-})();
+$(function() {
+	$("body").on("click", "a", clickTorrent);
+	console.log("Capturing clicks");
+});
