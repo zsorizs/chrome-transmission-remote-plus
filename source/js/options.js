@@ -25,15 +25,15 @@ function addDir(label, dir) {
 		if (table.rows[i].childNodes[0].childNodes[0].value === label) return;
 	}
 
-	var rowElem = table.insertRow(table.rows.length-1),
-		col1Elem = rowElem.insertCell(-1),
-		col2Elem = rowElem.insertCell(-1),
-		col3Elem = rowElem.insertCell(-1),
-		labelElem = document.createElement('input'),
-		dirElem = document.createElement('input'),
-		upButton = document.createElement('div'),
-		downButton = document.createElement('div'),
-		removeButton = document.createElement('div');
+	var rowElem = table.insertRow(table.rows.length-1);
+	var col1Elem = rowElem.insertCell(-1);
+	var col2Elem = rowElem.insertCell(-1);
+	var col3Elem = rowElem.insertCell(-1);
+	var labelElem = document.createElement('input');
+	var dirElem = document.createElement('input');
+	var upButton = document.createElement('div');
+	var downButton = document.createElement('div');
+	var removeButton = document.createElement('div');
 
 	col1Elem.appendChild(labelElem);
 	col2Elem.appendChild(dirElem);
