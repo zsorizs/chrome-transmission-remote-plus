@@ -53,5 +53,4 @@ function clickTorrent(e) {
 
 $(function() {
 	$("body").on("click", "a", clickTorrent);
-	console.log("Capturing clicks");
 });
