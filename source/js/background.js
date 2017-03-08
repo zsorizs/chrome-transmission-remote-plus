@@ -184,8 +184,8 @@ function dlTorrent(request) {
 
 	// how are we going to send this torrent to transmission?
 	var args = (typeof request.data !== 'undefined') ? '"metainfo": "' + request.data + '"' : '"filename": "' + request.url + '"';
-	// where are we going to download it to?
-	if (typeof request.dir !== 'undefined') {
+	// where are we going to download it to? empty dir means default
+	if (typeof request.dir !== 'undefined' && request.dir != '') {
 		args += ', "download-dir": "' + request.dir + '"';
 	}
 	
