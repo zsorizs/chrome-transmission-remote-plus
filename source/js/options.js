@@ -113,6 +113,7 @@ $(function() {
 
 	var VERCONFIG = 6;	//This value must be updated in background.js too
 	var defaults = {
+		"verConfig"						: VERCONFIG,
 		"server"						: "http://localhost:9091/transmission",
 		"rpcPath"						: "rpc",
 		"webPath"						: "web",
@@ -159,18 +160,22 @@ $(function() {
 	} ();
 
 	//                       first install              big settings change
-	if (localStorage.verConfig === 'undefined' || localStorage.verConfig < VERCONFIG) {
+	if (localStorage.verConfig === undefined || localStorage.verConfig < VERCONFIG) {
+		console.log("Upgrading configuration from " + localStorage.verConfig + " to " + VERCONFIG);
 		//Reset everything to defaults
 		for (var i in defaults) {
 				localStorage[i] = defaults[i];
 		}
 	} else {	//user opened it, or it's been automatically opened
 		// set default options for any unset options - may be triggered on minor additions that don't require a full reconfiguration by the user
-		for (var i in defaults) {
+		for (let i in defaults) {
 			if (typeof(localStorage[i]) === "undefined") {
+				console.log("Adding new config option " + i + " from defaults");
 				localStorage[i] = defaults[i];
 			}
 		}
+		// always update config version
+		localStorage.verConfig = VERCONFIG;
 	}
 
 	var dirs = JSON.parse(localStorage.dirs);
