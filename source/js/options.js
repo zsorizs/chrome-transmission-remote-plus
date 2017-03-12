@@ -90,7 +90,7 @@ function save() {
 	localStorage.start_paused = $('#start_paused').checked;
 	
 	//whether to handle the torrent click (i.e. download remotely) or leave to chrome to handle (download locally)
-	localStorage.clickAction = ($('#dlremote').checked) ? 'dlremote' : 'dllocal';
+	localStorage.clickAction = $("input[name='clickaction']:checked").val()
 
 	//whether or not to show the download popup
 	localStorage.dlPopup = $('#dlpopup').checked;
